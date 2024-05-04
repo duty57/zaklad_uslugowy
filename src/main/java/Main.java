@@ -14,19 +14,20 @@ import static javafx.application.Application.launch;
 
 public class Main extends Application {
 
-
+    private static Semaphore semaforT = new Semaphore(3);
+    private static Semaphore semaforA = new Semaphore(1);
+    private static Zaklad zaklad = new Zaklad();
+    private static Technik[] technik = new Technik[3];
+    private static Akwizytor akwizytor = new Akwizytor(0, zaklad, semaforA);
 
     public static void main(String[] args) {
 
         launch(args);
-        Semaphore semaforT = new Semaphore(3);
-        Semaphore semaforA = new Semaphore(1);
-        Zaklad zaklad = new Zaklad();
-        Technik[] technik = new Technik[3];
+
+
         for(int i = 0; i < 3; i++) {
             technik[i] = new Technik(i, zaklad, semaforT);
         }
-        Akwizytor akwizytor = new Akwizytor(0, zaklad, semaforA);
         for(int i = 0; i < 50; i++) {
             Sprzet sprzet = new Sprzet();
             zaklad.dodajDoKolejki(sprzet);

@@ -46,7 +46,7 @@ public class Technik extends Thread{
 
     public boolean wezSprzet(){
         try {
-            if(zaklad.getSprzetSize() > 0){
+            if(zaklad.getSprzetSize() == 0){
                 return false;
             }
             this.sprzet = zaklad.wezSprzet();
