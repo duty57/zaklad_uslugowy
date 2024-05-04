@@ -2,7 +2,7 @@ import java.util.LinkedList;
 
 public class Zaklad {
 
-    public final int MAX_SIZE = 100;
+    public int MAX_SIZE = 100;
     private LinkedList<Sprzet> sprzet = new LinkedList<Sprzet>();
 //    private Technik[] technicy = new Technik[3];
 //    private Akwizytor akwizytor = new Akwizytor();

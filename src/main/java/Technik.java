@@ -23,7 +23,7 @@ public class Technik extends Thread{
     public void run(){
 
         try {
-            Thread.sleep(700 + id*20);
+            Thread.sleep(300 + id*300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -45,6 +45,7 @@ public class Technik extends Thread{
     }
 
     public boolean wezSprzet(){
+        System.out.println("Technik " + this.id + " pobiera sprzet");
         try {
             if(zaklad.getSprzetSize() == 0){
                 return false;
