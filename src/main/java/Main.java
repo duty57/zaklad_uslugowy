@@ -1,12 +1,24 @@
 
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
+
+import java.awt.*;
+import java.util.Collection;
 import java.util.concurrent.Semaphore;
 
-public class Main {
+import static javafx.application.Application.launch;
+
+public class Main extends Application {
 
 
 
     public static void main(String[] args) {
 
+        launch(args);
         Semaphore semaforT = new Semaphore(3);
         Semaphore semaforA = new Semaphore(1);
         Zaklad zaklad = new Zaklad();
@@ -34,5 +46,23 @@ public class Main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        Rectangle r = new Rectangle();
+        r.setX(50);
+        r.setY(50);
+        r.setWidth(100);
+        r.setHeight(100);
+       // r.setFill();
+
+        Group root = new Group(r);
+
+       // stage.setFullScreen(true);
+        stage.setTitle("Canvas");
+        Scene scene = new Scene(root, 500, 500);
+        stage.setScene(scene);
+        stage.show();
     }
 }

@@ -30,6 +30,7 @@ public class Sprzet {
     private Shape ksztalt;
     private State stan;
     private Wlasciciel wlasciciel;
+    private String adres;
 
     public int id;
 
@@ -69,5 +70,13 @@ public class Sprzet {
 
     public State getStan() {
         return stan;
+    }
+
+    public Wlasciciel getWlasciciel(){
+        return wlasciciel;
+    }
+
+    public void setAdres(String adres){
+        this.adres = adres;
     }
 }

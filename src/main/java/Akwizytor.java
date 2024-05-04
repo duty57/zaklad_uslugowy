@@ -33,6 +33,7 @@ public class Akwizytor extends Thread{
         try {
             if(zaklad.getSprzetSize() <= zaklad.MAX_SIZE){
                 this.sprzet = zaklad.wezZKolejki();
+                zapiszAdres();
                 zaklad.usunZKolejki(sprzet);
                 Thread.sleep(200);
                 zaklad.dodajSprzet(sprzet);
@@ -45,6 +46,14 @@ public class Akwizytor extends Thread{
         }
     }
 
+    public void zapiszAdres(){
+        try {
+            Thread.sleep(100);
+            this.sprzet.setAdres(this.sprzet.getWlasciciel().getAdres());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

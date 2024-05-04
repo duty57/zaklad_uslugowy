@@ -40,4 +40,7 @@ public class Wlasciciel {
         adres = Wlasciciel.miasto[miasto.nextInt(10)] + " " + Wlasciciel.ulica[ulica.nextInt(15)] + " " + numer.nextInt(200) + "/" + lokal.nextInt(60);
     }
 
+    public String getAdres() {//metoda zwracajaca adres Wlasciciela
+        return adres;
+    }
 }
