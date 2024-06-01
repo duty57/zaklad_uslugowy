@@ -22,6 +22,7 @@ public class Main extends Application {
     public static Properties prop = null;//readProperties();
     private static Semaphore semaforT = new Semaphore(3);
     private static Semaphore semaforA = new Semaphore(1);
+    private static Semaphore accessToSprzet = new Semaphore(1);
     private static Zaklad zaklad = new Zaklad();
     private static Technik[] technik = new Technik[3];
     private static Akwizytor akwizytor = new Akwizytor(0, zaklad, semaforA);
@@ -44,7 +45,7 @@ public class Main extends Application {
         launch(args);
 
         for(int i = 0; i < iloscTechnikow; i++) {
-            technik[i] = new Technik(i, zaklad, semaforT);
+            technik[i] = new Technik(i, zaklad, semaforT, accessToSprzet);
         }
         for(int i = 0; i < iloscSprzetu; i++) {
             Sprzet sprzet = new Sprzet();

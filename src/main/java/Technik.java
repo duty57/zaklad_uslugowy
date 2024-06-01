@@ -12,11 +12,13 @@ public class Technik extends Thread{
     private Sprzet sprzet;
 
     private Semaphore semafor;
+    private Semaphore accessToSprzet;
 
-    public Technik(int id, Zaklad zaklad, Semaphore semafor){
+    public Technik(int id, Zaklad zaklad, Semaphore semafor, Semaphore accessToSprzet){
         this.id = id;
         this.zaklad = zaklad;
         this.semafor = semafor;
+        this.accessToSprzet = accessToSprzet;
         this.imie = "Technik_" + id;
     }
 
