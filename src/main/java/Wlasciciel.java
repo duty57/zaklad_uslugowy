@@ -1,3 +1,7 @@
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.util.Pair;
+
 import java.util.Random;
 
 
@@ -8,17 +12,17 @@ public class Wlasciciel {
     public static String nazwiska [] = {"Nowak", "Kowalski", "Wisniewski", "Wojcik", "Kowalczyk", "Kaminski", "Lewandowski", "Zielinski", "Szymanski", "Wozniak", "Dabrowski", "Kozlowski", "Jankowski", "Mazur", "Kwiatkowski", "Wojciechowski", "Krawczyk", "Kaczmarek", "Piotrowski", "Grabowski"};//20
     public static String miasto[] = {"Warszawa", "Krakow", "Gdansk", "Wroclaw", "Poznan", "Lodz", "Szczecin", "Lublin", "Katowice", "Bialystok"};//10
     public static String ulica[] = {"Kwiatowa", "Klonowa", "Szkolna", "Lesna", "Polna", "Koscielna", "Mickiewicza", "Sienkiewicza", "Wolnosci", "Pilsudskiego", "Jana Pawla II", "Kopernika", "Kosciuszki", "Wyspianskiego", "Reymonta"};//15
-
-
-
     private String imie;
     private String nazwisko;
     private String adres;
+    private Group root;
+    private Pair<Integer, Integer> position;
 
-    public Wlasciciel() {//konstruktor klasy Wlasciciel
+    public Wlasciciel(Group root) {//konstruktor klasy Wlasciciel
         wygenerujImie();
         wygenerujNazwisko();
         wygenerujAdres();
+        this.root = root;
     }
 
     public void wygenerujImie(){//generowanie imienia Wlasciciela

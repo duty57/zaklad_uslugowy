@@ -1,3 +1,6 @@
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.util.Pair;
 
 public class Sprzet {
 
@@ -31,16 +34,19 @@ public class Sprzet {
     private State stan;
     private Wlasciciel wlasciciel;
     private String adres;
+    private Group root;
+    private Pair<Integer, Integer> position;
 
     public int id;
 
-    Sprzet(){
+    Sprzet(int id, Group root){
         wygenerujNazwe();
         wygenerujKolor();
         wygenerujKsztalt();
         wygenerujStan();
-        wlasciciel = new Wlasciciel();
-
+        wlasciciel = new Wlasciciel(root);
+        this.id = id;
+        this.root = root;
     }
 
     public void wygenerujNazwe(){
