@@ -1,5 +1,7 @@
+import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +29,6 @@ public class Simulation extends Thread{
         int iloscAkwizytorow = 1;
         int iloscSprzetu = 50;
         if(prop != null) {
-
             iloscTechnikow = Integer.parseInt(prop.getProperty("iloscTechnikow"));
             iloscAkwizytorow = Integer.parseInt(prop.getProperty("iloscAkwizytorow"));
             iloscSprzetu = Integer.parseInt(prop.getProperty("iloscSprzetu"));

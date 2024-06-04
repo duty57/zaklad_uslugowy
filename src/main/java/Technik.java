@@ -1,8 +1,11 @@
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.FileInputStream;
@@ -15,7 +18,6 @@ public class Technik extends Thread{
 
     private String imie;
     private int id;
-
     private int []czasNaprawy = {380, 800, 1700};
     private Zaklad zaklad;
     private Sprzet sprzet;
@@ -24,6 +26,7 @@ public class Technik extends Thread{
     private Group root;
     private ImageView imageView;
     private Pair<Integer, Integer> position;
+    private Rectangle progressBar;
     public Technik(int id, Zaklad zaklad, Semaphore semafor, Semaphore accessToSprzet, Group root){
         this.id = id;
         this.zaklad = zaklad;
@@ -71,7 +74,9 @@ public class Technik extends Thread{
             if (this.sprzet != null) {
                 System.out.println("Technik " + this.id + " naprawia sprzet nr " + this.sprzet.id);
                 zaklad.usunSprzet(sprzet);
-                Thread.sleep(200);
+                goForSprzet();
+                Thread.sleep(400);
+                goBack();
                 return true;
             } else {
                 return false;
@@ -104,7 +109,7 @@ public class Technik extends Thread{
 
     public void opakujSprzet(){
         try {
-            Thread.sleep(150);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -112,7 +117,7 @@ public class Technik extends Thread{
 
     public void naklejNaklejke(){
         try {
-            Thread.sleep(100);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -120,7 +125,7 @@ public class Technik extends Thread{
 
     public void oddajSprzet(){
         try {
-            Thread.sleep(200);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -142,5 +147,46 @@ public class Technik extends Thread{
         this.imageView.toBack();
 
         root.getChildren().add(this.imageView);
+    }
+
+    public void goForSprzet(){
+        TranslateTransition tt = new TranslateTransition(Duration.millis(400), imageView);
+        tt.byXProperty().set(350-position.getKey());
+        tt.byYProperty().set(250-position.getValue());
+        tt.play();
+    }
+
+    public void goBack(){
+        this.sprzet.goToTechnik(new Pair<>(350, 250));
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        TranslateTransition tt = new TranslateTransition(Duration.millis(400), imageView);
+        tt.byXProperty().set(-350+position.getKey());
+        tt.byYProperty().set(-250+position.getValue());
+        tt.play();
+        this.sprzet.goToWorkPlace(new Pair<>(850 + 100*id, 25));
+    }
+    public void packSprzet(){
+
+    }
+
+    public void oddajSprzed_d(){
+        TranslateTransition tt = new TranslateTransition();
+        tt.setNode(imageView);
+        tt.byXProperty().set(450-position.getKey());
+        tt.setByY(-position.getValue());
+        tt.setDuration(Duration.millis(200));
+        tt.play();
+    }
+    public void wroc(){
+        TranslateTransition tt = new TranslateTransition();
+        tt.setNode(imageView);
+        tt.byXProperty().set(-450+position.getKey());
+        tt.byYProperty().set(position.getValue());
+        tt.setDuration(Duration.millis(100));
+        tt.play();
     }
 }

@@ -3,11 +3,11 @@ import java.util.LinkedList;
 public class Zaklad {
 
     public int MAX_SIZE = 100;
-    private LinkedList<Sprzet> sprzet = new LinkedList<Sprzet>();
+    public static LinkedList<Sprzet> sprzet = new LinkedList<Sprzet>();
 //    private Technik[] technicy = new Technik[3];
 //    private Akwizytor akwizytor = new Akwizytor();
 
-    private LinkedList<Sprzet> kolejka = new LinkedList<Sprzet>();//kolejka na sprzet
+    public static LinkedList<Sprzet> kolejka = new LinkedList<Sprzet>();//kolejka na sprzet
 //    Zaklad(Technik[] technicy, Akwizytor akwizytor) {//konstruktor
 //        sprzet = null;
 //        this.technicy = technicy;
@@ -15,11 +15,6 @@ public class Zaklad {
 //        kolejka = null;
 //    }
 
-
-
-    public static void main(String[] args) {
-
-    }
 
 
     public void dodajSprzet(Sprzet sprzet) {//metoda dodajaca sprzet
@@ -52,5 +47,9 @@ public class Zaklad {
 
     public int getKolejkaSize(){//metoda zwracajaca rozmiar kolejki
         return this.kolejka.size();
+    }
+
+    public static int getPostion(Sprzet s){
+        return kolejka.indexOf(s);
     }
 }

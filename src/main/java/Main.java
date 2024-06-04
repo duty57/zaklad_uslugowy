@@ -53,7 +53,7 @@ public class Main extends Application {
         storage.setStroke(Color.BLACK);
         storage.setStrokeWidth(2);
 
-        Rectangle readyForSend = new Rectangle(450, 0, 100, 25);
+        Rectangle readyForSend = new Rectangle(1175, 150, 25, 100);
         readyForSend.setFill(Color.LIGHTYELLOW);
         readyForSend.setStroke(Color.BLACK);
         readyForSend.setStrokeWidth(2);
@@ -62,7 +62,7 @@ public class Main extends Application {
         Text entry = new Text(1050, 450, "Entry");
         entry.fontProperty().set(javafx.scene.text.Font.font(24));
 
-        Text exit = new Text(200, 24, "Exit");
+        Text exit = new Text(0, 400, "Exit");
         exit.fontProperty().set(javafx.scene.text.Font.font(24));
 
         root.getChildren().add(entry);
@@ -79,10 +79,6 @@ public class Main extends Application {
 
         Simulation sim = new Simulation(root);
         sim.start();
-
-
-
-
 
     }
 }

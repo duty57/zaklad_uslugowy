@@ -1,8 +1,15 @@
+import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Pair;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Random;
+
+import static java.lang.Thread.sleep;
 
 
 public class Wlasciciel {
@@ -17,12 +24,15 @@ public class Wlasciciel {
     private String adres;
     private Group root;
     private Pair<Integer, Integer> position;
+    private ImageView imageView;
 
-    public Wlasciciel(Group root) {//konstruktor klasy Wlasciciel
+    public Wlasciciel(Group root, Pair<Integer, Integer> pos) {//konstruktor klasy Wlasciciel
         wygenerujImie();
         wygenerujNazwisko();
         wygenerujAdres();
         this.root = root;
+       // this.position = new Pair<>(pos.getKey()+10, pos.getValue()-15);
+
     }
 
     public void wygenerujImie(){//generowanie imienia Wlasciciela
@@ -46,5 +56,42 @@ public class Wlasciciel {
 
     public String getAdres() {//metoda zwracajaca adres Wlasciciela
         return adres;
+    }
+
+    public void draw(Pair<Integer, Integer> pos){//metoda rysujaca Wlasciciela
+        Image image = null;
+        this.position = pos;
+        try {
+            image = new Image(new FileInputStream("images/actor.png"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        this.imageView = new ImageView(image);
+        this.imageView.setX(position.getKey()-5);
+        this.imageView.setY(position.getValue()-10);
+        this.imageView.setFitHeight(50);
+        this.imageView.setFitWidth(50);
+        this.imageView.toBack();
+
+        root.getChildren().add(this.imageView);
+    }
+
+    public void stepForward(){
+        TranslateTransition tt = new TranslateTransition();
+        tt.setNode(imageView);
+        tt.byXProperty().set(-75);
+        tt.byYProperty().set(0);
+        tt.setDuration(javafx.util.Duration.millis(400));
+        tt.play();
+        position = new Pair<>(position.getKey()-75, position.getValue());
+    }
+    public void exit(){
+        TranslateTransition tt = new TranslateTransition();
+        tt.setNode(imageView);
+        tt.byXProperty().set(-this.position.getKey()-200);
+        tt.byYProperty().set(0);
+        tt.setDuration(javafx.util.Duration.millis(1000));
+        tt.play();
+        position = new Pair<>(-this.position.getKey(), this.position.getValue());
     }
 }

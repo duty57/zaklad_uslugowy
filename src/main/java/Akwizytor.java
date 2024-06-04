@@ -26,6 +26,7 @@ public class Akwizytor extends Thread{
     private ImageView imageView;
     private Pair<Integer, Integer> position;
 
+    private int iterator = 0;
 
     public Akwizytor(int id, Zaklad zaklad,  Semaphore semafor, Group root){
         this.id = id;
@@ -36,10 +37,15 @@ public class Akwizytor extends Thread{
         position = new Pair<>(700, 275);
         Platform.runLater(this::draw);
 
+//        Platform.runLater(this::drawClients);
     }
 
     public void run(){
         while(zaklad.getKolejkaSize() > 0){
+            if(iterator == 0){
+                Platform.runLater(this::drawClients);
+            }
+
             try{
                 semafor.acquire();
                 dodajSprzet();
@@ -49,6 +55,7 @@ public class Akwizytor extends Thread{
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
+            iterator++;
         }
     }
 
@@ -56,10 +63,14 @@ public class Akwizytor extends Thread{
         try {
             if(zaklad.getSprzetSize() <= zaklad.MAX_SIZE){
                 this.sprzet = zaklad.wezZKolejki();
+                System.out.println("Sprzet: " + sprzet.id + " dodany do magazynu");
                 zapiszAdres();
                 zaklad.usunZKolejki(sprzet);
+                moveClient();
                 goToStorage();
-                Thread.sleep(800);
+                Thread.sleep(400);
+                goBack();
+                Thread.sleep(400);
                 zaklad.dodajSprzet(sprzet);
             }else {
                 zaklad.usunZKolejki(sprzet);
@@ -71,8 +82,9 @@ public class Akwizytor extends Thread{
     }
 
     public void zapiszAdres(){
+        Platform.runLater(this::writeDownAdress_d);
         try {
-            Thread.sleep(100);
+            Thread.sleep(400);
             this.sprzet.setAdres(this.sprzet.getWlasciciel().getAdres());
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -108,10 +120,43 @@ public class Akwizytor extends Thread{
     public void goToStorage(){
         //translate imageView to another position and back as animation
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), imageView);
-        translateTransition.byXProperty().set(200);
+        translateTransition.byXProperty().set(300-position.getKey());
         translateTransition.byYProperty().set(0);
-        translateTransition.setCycleCount(2);
-        translateTransition.setAutoReverse(true);
+        this.sprzet.goToAkwizytor(position);
+        try{
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.sprzet.goToStorage();
+
         translateTransition.play();
     }
+
+    public void drawClients(){
+        for(int i = 0; i < Zaklad.kolejka.size(); i++) {
+            Zaklad.kolejka.get(i).draw(new Pair<>(700 + i * 75, 350));
+        }
+    }
+
+    public void moveClient(){
+        for(int i = 0; i < Zaklad.kolejka.size(); i++){
+            Zaklad.kolejka.get(i).stepForward();
+        }
+    }
+
+    public void writeDownAdress_d(){
+        Rectangle note = new Rectangle(position.getKey()+25, position.getValue()+25, 15, 5);
+        note.setFill(Color.YELLOW);
+        root.getChildren().add(note);
+        this.sprzet.setNote(note, new Pair<>(position.getKey()+25, position.getValue()+25));
+    }
+    public void goBack(){
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), imageView);
+        translateTransition.byXProperty().set(-300+position.getKey());
+        translateTransition.byYProperty().set(0);
+        translateTransition.play();
+
+    }
 }
+
