@@ -74,6 +74,7 @@ public class Main extends Application {
 
         stage.setTitle("Canvas");
         Scene scene = new Scene(root, 1200, 800, Color.WHITE);
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
 

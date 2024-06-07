@@ -94,4 +94,8 @@ public class Wlasciciel {
         tt.play();
         position = new Pair<>(-this.position.getKey(), this.position.getValue());
     }
+
+    public ImageView getImageView() {
+        return imageView;
+    }
 }

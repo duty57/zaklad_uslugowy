@@ -4,24 +4,12 @@ public class Zaklad {
 
     public int MAX_SIZE = 100;
     public static LinkedList<Sprzet> sprzet = new LinkedList<Sprzet>();
-//    private Technik[] technicy = new Technik[3];
-//    private Akwizytor akwizytor = new Akwizytor();
-
     public static LinkedList<Sprzet> kolejka = new LinkedList<Sprzet>();//kolejka na sprzet
-//    Zaklad(Technik[] technicy, Akwizytor akwizytor) {//konstruktor
-//        sprzet = null;
-//        this.technicy = technicy;
-//        this.akwizytor = akwizytor;
-//        kolejka = null;
-//    }
-
 
 
     public void dodajSprzet(Sprzet sprzet) {//metoda dodajaca sprzet
         this.sprzet.add(sprzet);
-
     }
-
     public void usunSprzet(Sprzet sprzet) {//metoda usuwajaca sprzet
         this.sprzet.remove(sprzet);
     }

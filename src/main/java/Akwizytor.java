@@ -25,8 +25,8 @@ public class Akwizytor extends Thread{
     private Group root;
     private ImageView imageView;
     private Pair<Integer, Integer> position;
-
     private int iterator = 0;
+    private int positionOnStorage = 0;
 
     public Akwizytor(int id, Zaklad zaklad,  Semaphore semafor, Group root){
         this.id = id;
@@ -46,6 +46,7 @@ public class Akwizytor extends Thread{
                 Platform.runLater(this::drawClients);
             }
 
+
             try{
                 semafor.acquire();
                 dodajSprzet();
@@ -56,6 +57,8 @@ public class Akwizytor extends Thread{
                 e.printStackTrace();
             }
             iterator++;
+            positionOnStorage++;
+            positionOnStorage = positionOnStorage % 30;
         }
     }
 
@@ -120,8 +123,8 @@ public class Akwizytor extends Thread{
     public void goToStorage(){
         //translate imageView to another position and back as animation
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), imageView);
-        translateTransition.byXProperty().set(300-position.getKey());
-        translateTransition.byYProperty().set(0);
+        translateTransition.byXProperty().set(320-position.getKey());
+        translateTransition.byYProperty().set(-7*positionOnStorage);
         this.sprzet.goToAkwizytor(position);
         try{
             Thread.sleep(400);
@@ -153,8 +156,8 @@ public class Akwizytor extends Thread{
     }
     public void goBack(){
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), imageView);
-        translateTransition.byXProperty().set(-300+position.getKey());
-        translateTransition.byYProperty().set(0);
+        translateTransition.byXProperty().set(-320+position.getKey());
+        translateTransition.byYProperty().set(7*positionOnStorage);
         translateTransition.play();
 
     }

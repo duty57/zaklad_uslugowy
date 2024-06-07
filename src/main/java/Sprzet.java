@@ -7,6 +7,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
+import java.util.MissingResourceException;
+
 import static java.lang.Thread.sleep;
 
 public class Sprzet {
@@ -43,7 +45,7 @@ public class Sprzet {
     private Rectangle note;
     private Pair<Integer, Integer> notePos;
     public int id;
-    Circle mesh;
+    private Circle mesh;
 
     public static int positionOnStorage = 0;
     Sprzet(int id, Group root){
@@ -130,15 +132,15 @@ public class Sprzet {
         position = new Pair<>(320, 250- positionOnStorage*7);
         notePos = new Pair<>(310, 250- positionOnStorage*7);
         positionOnStorage++;
+        positionOnStorage = positionOnStorage%30;
     }
 
     public void goToTechnik(Pair<Integer, Integer> pos){
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), this.mesh);
+        TranslateTransition tt = new TranslateTransition(Duration.millis(100), this.mesh);
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
 
-        System.out.println("note: " + note);
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(400), this.note);
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(100), this.note);
         ttn.byYProperty().set(pos.getValue() - notePos.getValue());
         ttn.byXProperty().set(pos.getKey() - notePos.getKey());
 
@@ -153,7 +155,6 @@ public class Sprzet {
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
 
-        System.out.println("note: " + note);
 
         TranslateTransition ttn = new TranslateTransition(Duration.millis(400), this.note);
         ttn.byYProperty().set(pos.getValue() - notePos.getValue());
@@ -163,5 +164,28 @@ public class Sprzet {
         ttn.play();
         position = pos;
         notePos = pos;
+    }
+
+    public void putNoteOnBox_d(int packX, int packY){
+        root.getChildren().remove(this.note);
+        root.getChildren().add(this.note);
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(300), this.note);
+        ttn.byXProperty().set(packX - notePos.getKey()-25);
+        ttn.byYProperty().set(packY - notePos.getValue()-15);
+        ttn.play();
+        notePos = new Pair<>(packX - notePos.getKey()-25, packY - notePos.getValue()-15);
+        root.getChildren().remove(wlasciciel.getImageView());
+    }
+    public Pair<Integer, Integer> getPosition(){
+        return position;
+    }
+    public Circle getMesh(){
+        return this.mesh;
+    }
+    public Rectangle getNoteMesh(){
+        return this.note;
+    }
+    public Pair<Integer, Integer> getNotePos() {
+        return notePos;
     }
 }
