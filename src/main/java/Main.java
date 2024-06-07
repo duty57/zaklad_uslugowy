@@ -38,22 +38,22 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Group root = new Group();
+        Group root = new Group();//new Pane();
 
-        Rectangle workPlace = new Rectangle(800, 0, 400, 50);
+        Rectangle workPlace = new Rectangle(800, 0, 400, 50);//work place where technicians work
         workPlace.setFill(Color.GRAY);
         workPlace.setStroke(Color.BLACK);
         workPlace.setStrokeWidth(2);
 
-        Rectangle road = new Rectangle(600, 300, 600, 100);
+        Rectangle road = new Rectangle(600, 300, 600, 100);//road where visitors come
         road.setFill(Color.INDIANRED);
 
-        Rectangle storage = new Rectangle(300, 0, 50, 300);
+        Rectangle storage = new Rectangle(300, 0, 50, 300);//storage for the equipment
         storage.setFill(Color.GRAY);
         storage.setStroke(Color.BLACK);
         storage.setStrokeWidth(2);
 
-        Rectangle readyForSend = new Rectangle(1175, 150, 25, 100);
+        Rectangle readyForSend = new Rectangle(1175, 150, 25, 100);//place where equipment is ready for send
         readyForSend.setFill(Color.LIGHTYELLOW);
         readyForSend.setStroke(Color.BLACK);
         readyForSend.setStrokeWidth(2);
