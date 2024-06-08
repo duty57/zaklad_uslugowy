@@ -29,8 +29,7 @@ public class Receptionist extends Thread {
     private int writeDownAddressTime;
     private int stepForwardTime;
     private int clientExitTime;
-    private int drawnClients = 0;
-
+    private boolean semState = false;
     private Group root;
     private ImageView mesh;//image of receptionist
     private Pair<Integer, Integer> defaultPosition;//position of receptionist
@@ -56,8 +55,6 @@ public class Receptionist extends Thread {
 
     public void run() {
         while (service.getQueueSize() > 0) {//while thread is not interrupted
-
-
 
                 if (iterator == 0) {//draw clients only once
                     Platform.runLater(this::drawClients);
@@ -161,7 +158,6 @@ public class Receptionist extends Thread {
     public void drawClients() {//draw clients in queue
         for (int i = 0; i < Service.queue.size(); i++) {
             Service.queue.get(i).draw(new Pair<>(700 + i * 75, 350));
-            drawnClients++;
         }
     }
 

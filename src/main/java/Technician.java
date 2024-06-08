@@ -34,7 +34,8 @@ public class Technician extends Thread {
     private int packTime;
     private int putAsideTime;
     private Semaphore semaphore;
-    private Semaphore accessToSprzet;
+    private Semaphore accessToEquipment;
+    private static Circle semaphoreState;
     private Group root;
     private ImageView Mesh;// mesh of technician
     private Pair<Integer, Integer> position;// position of technician
@@ -47,7 +48,7 @@ public class Technician extends Thread {
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
-        this.accessToSprzet = accessToSprzet;
+        this.accessToEquipment = accessToSprzet;
         this.name = "Technician_" + id;
         this.goToStorageTime = goToStorageTime;
         this.repairTime = repairTime;
@@ -65,15 +66,15 @@ public class Technician extends Thread {
             try {
                 speedRate = currentSpeedRate;
                 semaphore.acquire();
-                accessToSprzet.acquire();
+                accessToEquipment.acquire();
                 boolean ifAvaliableEquipment = takeEquipment();
                 if (ifAvaliableEquipment) {
-                    accessToSprzet.release();
+                    accessToEquipment.release();
                     this.fix();
                     this.packEquipment();
                     this.putAside();
                 } else {
-                    accessToSprzet.release();
+                    accessToEquipment.release();
                 }
 
                 semaphore.release();
@@ -169,15 +170,19 @@ public class Technician extends Thread {
         this.Mesh.setFitWidth(50);
         this.Mesh.toBack();
 
+        this.semaphoreState = new Circle(365, 10, 5, Color.GREEN);// semaphore state
+
         this.progressBar = new Circle(position.getKey() + 25, position.getValue() + 60, 2, Color.GREEN);// progress bar
         this.progressBar.toFront();
         this.progressBar.setVisible(false);
 
         root.getChildren().add(this.Mesh);
         root.getChildren().add(this.progressBar);
+        root.getChildren().add(this.semaphoreState);
     }
 
     public void goForEquipment() {// go for equipment
+        semaphoreState.setFill(Color.RED);
         TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime / (speedRate))), Mesh);
         tt.byXProperty().set(350 - position.getKey());
         tt.byYProperty().set(250 - position.getValue());
@@ -200,6 +205,7 @@ public class Technician extends Thread {
 
 
     public void fix_d() {// fix equipment
+        semaphoreState.setFill(Color.GREEN);
         progressBar.setVisible(true);
         ScaleTransition st = new ScaleTransition();
         st.setNode(progressBar);
