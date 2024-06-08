@@ -28,7 +28,7 @@ public class Technician extends Thread{
     private Equipment equipment;
     private int time;
     private float speedRate = 1;
-    private float currentSpeedRate = 2;
+    private float currentSpeedRate = 1;
     private int goToStorageTime;
     private int repairTime;
     private int packTime;
@@ -188,11 +188,11 @@ public class Technician extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(4*speedRate))), Mesh);
+        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(speedRate))), Mesh);
         tt.setToX(0);
         tt.setToY(0);
-        tt.play();
         this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), (int) (goToStorageTime/speedRate));
+        tt.play();
     }
 
 
@@ -207,14 +207,15 @@ public class Technician extends Thread{
     }
 
         public void pack_d(){// pack equipment
-        progressBar.setVisible(false);
-        equipment.getMesh().setVisible(false);
-        ScaleTransition st = new ScaleTransition();
+        progressBar.setVisible(false);// hide progress bar
+        equipment.getMesh().setVisible(false);// hide equipment mesh
+        ScaleTransition st = new ScaleTransition();// show progress bar
         st.setNode(progressBar);
         st.setByX(-2);
         st.setByY(-2);
         st.setDuration(Duration.millis(packTime/speedRate));
         st.play();
+
         packMesh = new Rectangle(25,25);
         packMesh.setFill(Color.SANDYBROWN);
         packMesh.setX(equipment.getPosition().getKey()-10);
@@ -222,6 +223,7 @@ public class Technician extends Thread{
         root.getChildren().add(packMesh);
         packPos = new Pair<>(equipment.getPosition().getKey()-10, equipment.getPosition().getValue()+10);
         equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue(), (int)(packTime/speedRate));
+
 
     }
     public void putAside_d(){// put aside equipment
