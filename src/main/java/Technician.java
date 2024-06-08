@@ -24,6 +24,10 @@ public class Technician extends Thread{
     private Service service;
     private Equipment equipment;
     private int time;
+    private int goToStorageTime;
+    private int repairTime;
+    private int packTime;
+    private int putAsideTime;
     private Semaphore semaphore;
     private Semaphore accessToSprzet;
     private Group root;
@@ -32,17 +36,20 @@ public class Technician extends Thread{
     private Circle progressBar;// progress bar of fixing equipment
     private Rectangle packMesh;// mesh of packed equipment
     private Pair<Integer, Integer> packPos;// position of packed equipment
-    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root){// constructor
+    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int repairTime, int packTime, int putAsideTime){// constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
         this.accessToSprzet = accessToSprzet;
         this.name = "Technician_" + id;
+        this.goToStorageTime = goToStorageTime;
+        this.repairTime = repairTime;
+        this.packTime = packTime;
+        this.putAsideTime = putAsideTime;
         this.root = root;
         position = new Pair<>(850 + 100*id, 25);
         Platform.runLater(this::draw);
     }
-
     public void run(){
 
         while(service.getEquipment() > 0 || service.getQueueSize() > 0){// while there are equipment to fix
@@ -76,9 +83,9 @@ public class Technician extends Thread{
                 System.out.println("Technician " + this.id + " fixing equipment nr " + this.equipment.id);
                 service.removeEquipment(equipment);
                 goForEquipment();
-                Thread.sleep(400);
+                Thread.sleep(goToStorageTime);
                 goBack();
-                Thread.sleep(400);
+                Thread.sleep(goToStorageTime);
                 return true;
             } else {
                 return false;
@@ -90,28 +97,7 @@ public class Technician extends Thread{
         }
     }
 
-    public void draw(){// draw technician
 
-        Image image = null;
-        try {
-            image = new Image(new FileInputStream("images/actor.png"));// load image
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        this.Mesh = new ImageView(image);
-        this.Mesh.setX(position.getKey());
-        this.Mesh.setY(position.getValue());
-        this.Mesh.setFitHeight(50);
-        this.Mesh.setFitWidth(50);
-        this.Mesh.toBack();
-
-        this.progressBar = new Circle(position.getKey()+25, position.getValue()+60, 2, Color.GREEN);// progress bar
-        this.progressBar.toFront();
-        this.progressBar.setVisible(false);
-
-        root.getChildren().add(this.Mesh);
-        root.getChildren().add(this.progressBar);
-    }
 
     public void fix(){// fix equipment
         try {
@@ -142,7 +128,7 @@ public class Technician extends Thread{
     public void packEquipment(){// pack equipment
         try {
             Platform.runLater(this::pack_d);
-            Thread.sleep(400);
+            Thread.sleep(packTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -151,12 +137,34 @@ public class Technician extends Thread{
     public void putAside(){// put aside equipment
         try {
             putAside_d();
-            Thread.sleep(400);
+            Thread.sleep(putAsideTime);
             goBack2();
-            Thread.sleep(400);
+            Thread.sleep(putAsideTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    public void draw(){// draw technician
+
+        Image image = null;
+        try {
+            image = new Image(new FileInputStream("images/actor.png"));// load image
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        this.Mesh = new ImageView(image);
+        this.Mesh.setX(position.getKey());
+        this.Mesh.setY(position.getValue());
+        this.Mesh.setFitHeight(50);
+        this.Mesh.setFitWidth(50);
+        this.Mesh.toBack();
+
+        this.progressBar = new Circle(position.getKey()+25, position.getValue()+60, 2, Color.GREEN);// progress bar
+        this.progressBar.toFront();
+        this.progressBar.setVisible(false);
+
+        root.getChildren().add(this.Mesh);
+        root.getChildren().add(this.progressBar);
     }
 
     public void goForEquipment(){// go for equipment
@@ -167,9 +175,9 @@ public class Technician extends Thread{
     }
 
     public void goBack(){// go back
-        this.equipment.goToTechnician(new Pair<>(350, 250));
+        this.equipment.goToTechnician(new Pair<>(350, 250), goToStorageTime/4);
         try {
-            Thread.sleep(100);
+            Thread.sleep(goToStorageTime/4);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -177,7 +185,7 @@ public class Technician extends Thread{
         tt.byXProperty().set(-350+position.getKey());
         tt.byYProperty().set(-250+position.getValue());
         tt.play();
-        this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25));
+        this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), goToStorageTime);
     }
 
 
@@ -198,7 +206,7 @@ public class Technician extends Thread{
         st.setNode(progressBar);
         st.setByX(-2);
         st.setByY(-2);
-        st.setDuration(Duration.millis(100));
+        st.setDuration(Duration.millis(packTime));
         st.play();
         packMesh = new Rectangle(25,25);
         packMesh.setFill(Color.SANDYBROWN);
@@ -206,7 +214,7 @@ public class Technician extends Thread{
         packMesh.setY(equipment.getPosition().getValue()+10);
         root.getChildren().add(packMesh);
         packPos = new Pair<>(equipment.getPosition().getKey()-10, equipment.getPosition().getValue()+10);
-        equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue());
+        equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue(), packTime);
 
     }
     public void putAside_d(){// put aside equipment
@@ -214,19 +222,19 @@ public class Technician extends Thread{
         tt.setNode(Mesh);
         tt.byXProperty().set(1180-position.getKey());
         tt.setByY(175-position.getValue());
-        tt.setDuration(Duration.millis(400));
+        tt.setDuration(Duration.millis(putAsideTime));
 
         TranslateTransition ttp = new TranslateTransition();
         ttp.setNode(packMesh);
         ttp.byXProperty().set(1205-packPos.getKey());
         ttp.byYProperty().set(175-packPos.getValue());
-        ttp.setDuration(Duration.millis(400));
+        ttp.setDuration(Duration.millis(putAsideTime));
 
         TranslateTransition ttn = new TranslateTransition();
         ttn.setNode(equipment.getNoteMesh());
         ttn.byXProperty().set(1205-packPos.getKey());
         ttn.byYProperty().set(175-packPos.getValue());
-        ttn.setDuration(Duration.millis(400));
+        ttn.setDuration(Duration.millis(putAsideTime));
 
         tt.play();
         ttp.play();
@@ -237,7 +245,7 @@ public class Technician extends Thread{
         tt.setNode(Mesh);
         tt.byXProperty().set(-1180+position.getKey());
         tt.byYProperty().set(-175+position.getValue());
-        tt.setDuration(Duration.millis(400));
+        tt.setDuration(Duration.millis(putAsideTime));
         tt.play();
 
 

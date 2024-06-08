@@ -90,31 +90,31 @@ public class Equipment {
         owner.draw(new Pair<>(pos.getKey(), pos.getValue()));
     }
 
-    public void stepForward(){//step forward of equipment
+    public void stepForward(int time){//step forward of equipment
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(this.Mesh);
         tt.byXProperty().set(-75);
         tt.byYProperty().set(0);
-        tt.setDuration(javafx.util.Duration.millis(300));
-        this.owner.stepForward();
+        tt.setDuration(javafx.util.Duration.millis(time));
+        this.owner.stepForward(time);
         tt.play();//play animation
         position = new Pair<>(position.getKey()-75, position.getValue());
     }
 
-    public void goToReceptionist(Pair<Integer, Integer> pos){//set position of equipment to receptionist
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), this.Mesh);
+    public void goToReceptionist(Pair<Integer, Integer> pos, int time, int exitTime){//set position of equipment to receptionist
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);
         tt.byXProperty().set(0);
         tt.byYProperty().set(-50);
-        this.owner.exit();
+        this.owner.exit(exitTime);
         tt.play();//play animation
         position = new Pair<>(pos.getKey(), pos.getValue());
     }
-    public void goToStorage(){//set position of equipment to storage
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), this.Mesh);//create animation for equipment
+    public void goToStorage(int time){//set position of equipment to storage
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
         tt.byXProperty().set(320-position.getKey());
         tt.byYProperty().set(250-position.getValue() - positionOnStorage*7);
 
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(400), this.noteMesh);//create animation for note
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
         ttn.byXProperty().set(310-position.getKey());
         ttn.byYProperty().set(250-position.getValue()- positionOnStorage*7);
 
@@ -126,12 +126,12 @@ public class Equipment {
         positionOnStorage = positionOnStorage%30;
     }
 
-    public void goToTechnician(Pair<Integer, Integer> pos){//set position of equipment to technician
-        TranslateTransition tt = new TranslateTransition(Duration.millis(100), this.Mesh);//create animation for equipment
+    public void goToTechnician(Pair<Integer, Integer> pos, int time){//set position of equipment to technician
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
 
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(100), this.noteMesh);//create animation for note
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
         ttn.byYProperty().set(pos.getValue() - notePos.getValue());
         ttn.byXProperty().set(pos.getKey() - notePos.getKey());
 
@@ -141,13 +141,13 @@ public class Equipment {
         notePos = pos;
     }
 
-    public void goToWorkPlace(Pair<Integer, Integer> pos){//set position of equipment to work place
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), this.Mesh);//create animation for equipment
+    public void goToWorkPlace(Pair<Integer, Integer> pos, int time){//set position of equipment to work place
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
 
 
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(400), this.noteMesh);//create animation for note
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
         ttn.byYProperty().set(pos.getValue() - notePos.getValue());
         ttn.byXProperty().set(pos.getKey() - notePos.getKey());
 
@@ -157,10 +157,10 @@ public class Equipment {
         notePos = pos;
     }
 
-    public void putNoteOnBox_d(int packX, int packY){//put note on box animation
+    public void putNoteOnBox_d(int packX, int packY, int time){//put note on box animation
         root.getChildren().remove(this.noteMesh);
         root.getChildren().add(this.noteMesh);
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(300), this.noteMesh);//create animation for note
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
         ttn.byXProperty().set(packX - notePos.getKey()-25);
         ttn.byYProperty().set(packY - notePos.getValue()-15);
         ttn.play();

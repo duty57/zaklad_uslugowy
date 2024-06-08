@@ -74,21 +74,21 @@ public class Owner {
         root.getChildren().add(this.Mesh);//adding owner to root
     }
 
-    public void stepForward(){//method moving owner forward
+    public void stepForward(int time){//method moving owner forward
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
         tt.byXProperty().set(-75);
         tt.byYProperty().set(0);
-        tt.setDuration(javafx.util.Duration.millis(400));
+        tt.setDuration(javafx.util.Duration.millis(time));
         tt.play();
         position = new Pair<>(position.getKey()-75, position.getValue());//changing position
     }
-    public void exit(){//method moving owner out of the screen
+    public void exit(int time){//method moving owner out of the screen
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
         tt.byXProperty().set(-this.position.getKey()-200);
         tt.byYProperty().set(0);
-        tt.setDuration(javafx.util.Duration.millis(1000));
+        tt.setDuration(javafx.util.Duration.millis(time));
         tt.play();
         position = new Pair<>(-this.position.getKey(), this.position.getValue());//changing position
     }

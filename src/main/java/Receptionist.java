@@ -20,17 +20,25 @@ public class Receptionist extends Thread{
     private Service service;
     private Equipment equipment;
     private Semaphore semaphore;
+    private int goToStorageTime;
+    private int writeDownAddressTime;
+    private int stepForwardTime;
+    private int clientExitTime;
     private Group root;
     private ImageView mesh;//image of receptionist
     private Pair<Integer, Integer> position;//position of receptionist
     private int iterator = 0;
     private int positionOnStorage = 0;//position of equipment in storage
 
-    public Receptionist(int id, Service service, Semaphore semaphore, Group root){//constructor
+    public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime){//constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
         this.name = "Receptionist_" + id;
+        this.goToStorageTime = goToStorageTime;
+        this.writeDownAddressTime = writeDownAddressTime;
+        this.stepForwardTime = stepForwardTime;
+        this.clientExitTime = clientExitTime;
         this.root = root;
         position = new Pair<>(700, 275);
         Platform.runLater(this::draw);
@@ -65,9 +73,9 @@ public class Receptionist extends Thread{
                 service.removeFromQueue(equipment);
                 moveClient();
                 goToStorage();
-                Thread.sleep(400);
+                Thread.sleep(goToStorageTime);
                 goBack();
-                Thread.sleep(400);
+                Thread.sleep(goToStorageTime);
                 service.addEquipment(equipment);
             }else {
                 service.removeFromQueue(equipment);
@@ -81,7 +89,7 @@ public class Receptionist extends Thread{
     public void writeDownAddress(){//write down address of equipment
         Platform.runLater(this::writeDownAdress_d);
         try {
-            Thread.sleep(400);
+            Thread.sleep(writeDownAddressTime);
             this.equipment.setAddress(this.equipment.getOwner().getAddress());
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -116,16 +124,16 @@ public class Receptionist extends Thread{
 
     public void goToStorage(){//go to storage
         //translate imageView to another position and back as animation
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), mesh);
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime), mesh);
         translateTransition.byXProperty().set(320-position.getKey());
         translateTransition.byYProperty().set(-7*positionOnStorage);
-        this.equipment.goToReceptionist(position);
+        this.equipment.goToReceptionist(position, goToStorageTime, clientExitTime);
         try{
-            Thread.sleep(400);
+            Thread.sleep(goToStorageTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.equipment.goToStorage();
+        this.equipment.goToStorage(goToStorageTime);
 
         translateTransition.play();
     }
@@ -138,7 +146,7 @@ public class Receptionist extends Thread{
 
     public void moveClient(){//move clients in queue
         for(int i = 0; i < Service.queue.size(); i++){
-            Service.queue.get(i).stepForward();
+            Service.queue.get(i).stepForward(stepForwardTime);
         }
     }
 
@@ -149,7 +157,7 @@ public class Receptionist extends Thread{
         this.equipment.setNote(note, new Pair<>(position.getKey()+25, position.getValue()+25));
     }
     public void goBack(){//go back to receptionist
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), mesh);
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime), mesh);
         translateTransition.byXProperty().set(-320+position.getKey());
         translateTransition.byYProperty().set(7*positionOnStorage);
         translateTransition.play();

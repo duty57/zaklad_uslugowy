@@ -2,11 +2,13 @@ import java.util.LinkedList;
 
 public class Service {
 
-    public int MAX_SIZE = 100;
+    public int MAX_SIZE;
     public static LinkedList<Equipment> equipment = new LinkedList<Equipment>();//lista sprzetu
     public static LinkedList<Equipment> queue = new LinkedList<Equipment>();//lista kolejki
 
-
+    public Service(int max_size) {
+        this.MAX_SIZE = max_size;
+    }
     public void addEquipment(Equipment equipment) {
         this.equipment.add(equipment);
     }//metoda dodajaca sprzet
