@@ -20,6 +20,7 @@ public class Receptionist extends Thread{
     public String name;
     public int id;
     public float speedRate = 1;
+    private float currentSpeedRate = 1;
     private Service service;
     private Equipment equipment;
     private Semaphore semaphore;
@@ -29,9 +30,10 @@ public class Receptionist extends Thread{
     private int clientExitTime;
     private Group root;
     private ImageView mesh;//image of receptionist
-    private Pair<Integer, Integer> position;//position of receptionist
+    private Pair<Integer, Integer> defaultPosition;//position of receptionist
     private int iterator = 0;
     private int positionOnStorage = 0;//position of equipment in storage
+    private VBox SliderBox;
 
     public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime){//constructor
         this.id = id;
@@ -43,7 +45,7 @@ public class Receptionist extends Thread{
         this.stepForwardTime = stepForwardTime;
         this.clientExitTime = clientExitTime;
         this.root = root;
-        position = new Pair<>(700, 275);
+        defaultPosition = new Pair<>(700, 275);
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
     }
@@ -55,6 +57,7 @@ public class Receptionist extends Thread{
             }
             try{
                 semaphore.acquire();//acquire semaphore
+                speedRate = currentSpeedRate;
                 addEquipment();
                 System.out.println("Amount of equipment in storage: " + service.getEquipment());
                 System.out.println("Length of queue: " + service.getQueueSize());
@@ -107,8 +110,8 @@ public class Receptionist extends Thread{
             e.printStackTrace();
         }
         this.mesh = new ImageView(image);
-        this.mesh.setX(position.getKey());
-        this.mesh.setY(position.getValue());
+        this.mesh.setX(defaultPosition.getKey());
+        this.mesh.setY(defaultPosition.getValue());
         this.mesh.setFitHeight(50);
         this.mesh.setFitWidth(50);
         this.mesh.toBack();
@@ -125,19 +128,24 @@ public class Receptionist extends Thread{
     public void goToStorage(){//go to storage
         //translate imageView to another position and back as animation
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
-        translateTransition.byXProperty().set(320-position.getKey());
-        translateTransition.byYProperty().set(-7*positionOnStorage);
-        this.equipment.goToReceptionist(position, (int) (goToStorageTime/speedRate), clientExitTime);
+        translateTransition.setByX(320- defaultPosition.getKey());
+        translateTransition.setByY(-7*positionOnStorage);
+        this.equipment.goToReceptionist(defaultPosition, (int) (goToStorageTime/speedRate), clientExitTime);
         try{
             Thread.sleep((long) (goToStorageTime/speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         this.equipment.goToStorage((int) (goToStorageTime/speedRate));
+        translateTransition.play();
 
+    }
+    public void goBack(){//go back to receptionist
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
+        translateTransition.setToX(0);
+        translateTransition.setToY(0);
         translateTransition.play();
     }
-
     public void drawClients(){//draw clients in queue
         for(int i = 0; i < Service.queue.size(); i++) {
             Service.queue.get(i).draw(new Pair<>(700 + i * 75, 350));
@@ -151,26 +159,21 @@ public class Receptionist extends Thread{
     }
 
     public void writeDownAdress_d(){//write down address of equipment
-        Rectangle note = new Rectangle(position.getKey()+25, position.getValue()+25, 15, 5);
+        Rectangle note = new Rectangle(defaultPosition.getKey()+25, defaultPosition.getValue()+25, 15, 5);
         note.setFill(Color.YELLOW);
         root.getChildren().add(note);
-        this.equipment.setNote(note, new Pair<>(position.getKey()+25, position.getValue()+25));
+        this.equipment.setNote(note, new Pair<>(defaultPosition.getKey()+25, defaultPosition.getValue()+25));
     }
-    public void goBack(){//go back to receptionist
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
-        translateTransition.byXProperty().set(-320+position.getKey());
-        translateTransition.byYProperty().set(7*positionOnStorage);
-        translateTransition.play();
-    }
+
 
     public void drawSlider(){//draw slider
 
-        VBox SliderBox = new VBox();
+        SliderBox = new VBox();
         SliderBox.setLayoutX(100);
         SliderBox.setLayoutY(500);
         SliderBox.setSpacing(10);
 
-        Label label = new Label("Receptionist's speed rate:\n" + speedRate);
+        Label label = new Label("Receptionist's speed rate:\n" + currentSpeedRate);
 
         Slider slider = new Slider();
         slider.setMin(0.25);
@@ -185,8 +188,8 @@ public class Receptionist extends Thread{
         slider.setLayoutY(50);
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            speedRate = newValue.floatValue();
-            label.setText("Receptionist's speed rate:\n" + speedRate);
+            currentSpeedRate = newValue.floatValue();
+            label.setText("Receptionist's speed rate:\n" + currentSpeedRate);
 
         });
 
@@ -194,7 +197,7 @@ public class Receptionist extends Thread{
         SliderBox.getChildren().add(slider);
 
         root.getChildren().add(SliderBox);
-
     }
+
 }
 

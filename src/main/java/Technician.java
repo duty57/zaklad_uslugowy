@@ -27,7 +27,8 @@ public class Technician extends Thread{
     private Service service;
     private Equipment equipment;
     private int time;
-    public float speedRate = 1;
+    private float speedRate = 1;
+    private float currentSpeedRate = 2;
     private int goToStorageTime;
     private int repairTime;
     private int packTime;
@@ -59,6 +60,7 @@ public class Technician extends Thread{
 
         while(service.getEquipment() > 0 || service.getQueueSize() > 0){// while there are equipment to fix
             try{
+                speedRate = currentSpeedRate;
                 semaphore.acquire();
                 accessToSprzet.acquire();
                 boolean czyJestSprzet = takeEquipment();
@@ -173,7 +175,7 @@ public class Technician extends Thread{
     }
 
     public void goForEquipment(){// go for equipment
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), Mesh);
+        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(speedRate))), Mesh);
         tt.byXProperty().set(350-position.getKey());
         tt.byYProperty().set(250-position.getValue());
         tt.play();
@@ -186,9 +188,9 @@ public class Technician extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        TranslateTransition tt = new TranslateTransition(Duration.millis(400), Mesh);
-        tt.byXProperty().set(-350+position.getKey());
-        tt.byYProperty().set(-250+position.getValue());
+        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(4*speedRate))), Mesh);
+        tt.setToX(0);
+        tt.setToY(0);
         tt.play();
         this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), (int) (goToStorageTime/speedRate));
     }
@@ -248,8 +250,8 @@ public class Technician extends Thread{
     public void goBack2(){// go back
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
-        tt.byXProperty().set(-1180+position.getKey());
-        tt.byYProperty().set(-175+position.getValue());
+        tt.setToX(0);
+        tt.setToY(0);
         tt.setDuration(Duration.millis(putAsideTime/speedRate));
         tt.play();
     }
@@ -260,7 +262,7 @@ public class Technician extends Thread{
         SliderBox.setLayoutY(500);
         SliderBox.setSpacing(10);
 
-        Label label = new Label("Technician's "+ id + " speed rate:\n" + speedRate);
+        Label label = new Label("Technician's "+ id + " speed rate:\n" + currentSpeedRate);
 
         Slider slider = new Slider();
         slider.setMin(0.25);
@@ -275,8 +277,8 @@ public class Technician extends Thread{
         slider.setLayoutY(50);
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            speedRate = newValue.floatValue();
-            label.setText("Technician's "+ id + " speed rate:\n" + speedRate);
+            currentSpeedRate = newValue.floatValue();
+            label.setText("Technician's "+ id + " speed rate:\n" + currentSpeedRate);
 
         });
 
