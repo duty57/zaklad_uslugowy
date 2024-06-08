@@ -41,6 +41,7 @@ public class Technician extends Thread{
     private Circle progressBar;// progress bar of fixing equipment
     private Rectangle packMesh;// mesh of packed equipment
     private Pair<Integer, Integer> packPos;// position of packed equipment
+    private VBox box;
     public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int repairTime, int packTime, int putAsideTime){// constructor
         this.id = id;
         this.service = service;
@@ -220,9 +221,16 @@ public class Technician extends Thread{
         packMesh.setFill(Color.SANDYBROWN);
         packMesh.setX(equipment.getPosition().getKey()-10);
         packMesh.setY(equipment.getPosition().getValue()+10);
-        root.getChildren().add(packMesh);
         packPos = new Pair<>(equipment.getPosition().getKey()-10, equipment.getPosition().getValue()+10);
-        equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue(), (int)(packTime/speedRate));
+        equipment.putNoteOnBox_d();
+
+        box = new VBox();
+        box.setLayoutX(position.getKey());
+        box.setLayoutY(position.getValue());
+        root.getChildren().remove(equipment.getNoteMesh());
+        box.getChildren().add(packMesh);
+        box.getChildren().addAll(equipment.getNoteMesh());
+        root.getChildren().add(box);
 
 
     }
@@ -233,21 +241,16 @@ public class Technician extends Thread{
         tt.setByY(175-position.getValue());
         tt.setDuration(Duration.millis(putAsideTime/speedRate));
 
-        TranslateTransition ttp = new TranslateTransition();
-        ttp.setNode(packMesh);
-        ttp.byXProperty().set(1205-packPos.getKey());
-        ttp.byYProperty().set(175-packPos.getValue());
-        ttp.setDuration(Duration.millis(putAsideTime/speedRate));
+        TranslateTransition ttb = new TranslateTransition();
+        ttb.setNode(this.box);
+        ttb.byXProperty().set(1205-position.getKey());
+        ttb.byYProperty().set(175-position.getValue());
+        ttb.setDuration(Duration.millis(putAsideTime/speedRate));
 
-        TranslateTransition ttn = new TranslateTransition();
-        ttn.setNode(equipment.getNoteMesh());
-        ttn.byXProperty().set(1205-packPos.getKey());
-        ttn.byYProperty().set(175-packPos.getValue());
-        ttn.setDuration(Duration.millis(putAsideTime/speedRate));
 
         tt.play();
-        ttp.play();
-        ttn.play();
+        ttb.play();
+
     }
     public void goBack2(){// go back
         TranslateTransition tt = new TranslateTransition();

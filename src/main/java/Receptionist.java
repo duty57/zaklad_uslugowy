@@ -129,7 +129,7 @@ public class Receptionist extends Thread{
         //translate imageView to another position and back as animation
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
         translateTransition.setByX(320- defaultPosition.getKey());
-        translateTransition.setByY(-7*positionOnStorage);
+        translateTransition.setByY(-7*positionOnStorage-20);
         this.equipment.goToReceptionist(defaultPosition, (int) (goToStorageTime/speedRate), clientExitTime);
         try{
             Thread.sleep((long) (goToStorageTime/speedRate));

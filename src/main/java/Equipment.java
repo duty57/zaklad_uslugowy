@@ -155,16 +155,15 @@ public class Equipment {
         ttn.play();//play animation
         position = pos;
         notePos = pos;
+
     }
 
-    public void putNoteOnBox_d(int packX, int packY, int time){//put note on box animation
-        root.getChildren().remove(this.noteMesh);
-        root.getChildren().add(this.noteMesh);
-        TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
-        ttn.byXProperty().set(packX - notePos.getKey()-25);
-        ttn.byYProperty().set(packY - notePos.getValue()-15);
+    public void putNoteOnBox_d(){//put note on box animation
+
+        TranslateTransition ttn = new TranslateTransition(Duration.millis(1), this.noteMesh);//create animation for note
+        ttn.setToX(0);
+        ttn.setToY(-15);
         ttn.play();
-        notePos = new Pair<>(packX - notePos.getKey()-25, packY - notePos.getValue()-15);
         root.getChildren().remove(owner.getMesh());
     }
     public Pair<Integer, Integer> getPosition(){
