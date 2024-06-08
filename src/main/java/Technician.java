@@ -2,8 +2,11 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -24,6 +27,7 @@ public class Technician extends Thread{
     private Service service;
     private Equipment equipment;
     private int time;
+    public float speedRate = 1;
     private int goToStorageTime;
     private int repairTime;
     private int packTime;
@@ -49,6 +53,7 @@ public class Technician extends Thread{
         this.root = root;
         position = new Pair<>(850 + 100*id, 25);
         Platform.runLater(this::draw);
+        Platform.runLater(this::drawSlider);
     }
     public void run(){
 
@@ -83,9 +88,9 @@ public class Technician extends Thread{
                 System.out.println("Technician " + this.id + " fixing equipment nr " + this.equipment.id);
                 service.removeEquipment(equipment);
                 goForEquipment();
-                Thread.sleep(goToStorageTime);
+                Thread.sleep((long) (goToStorageTime/speedRate));
                 goBack();
-                Thread.sleep(goToStorageTime);
+                Thread.sleep((long) (goToStorageTime/speedRate));
                 return true;
             } else {
                 return false;
@@ -105,19 +110,19 @@ public class Technician extends Thread{
             Random rand = new Random();
             switch (this.equipment.getState()) {
                 case Equipment.State.WEAK_DAMAGED:
-                    time = rand.nextInt(reparationTime[0]) + reparationTime[0];
+                    time = (int) ((rand.nextInt(reparationTime[0]) + reparationTime[0])/speedRate);
                     fix_d();
-                    Thread.sleep(time);
+                    Thread.sleep((long) (time/speedRate));
                     break;
                 case Equipment.State.DAMAGED:
-                    time = rand.nextInt(reparationTime[1]) + reparationTime[1];
+                    time = (int) ((rand.nextInt(reparationTime[1]) + reparationTime[1])/speedRate);
                     fix_d();
-                    Thread.sleep(time);
+                    Thread.sleep((long) (time/speedRate));
                     break;
                 case Equipment.State.NOT_WORKING:
-                    time = rand.nextInt(reparationTime[2]) + reparationTime[2];
+                    time = (int) ((rand.nextInt(reparationTime[2]) + reparationTime[2])/speedRate);
                     fix_d();
-                    Thread.sleep(time);
+                    Thread.sleep((long) (time/speedRate));
                     break;
             }
         } catch (InterruptedException e) {
@@ -128,7 +133,7 @@ public class Technician extends Thread{
     public void packEquipment(){// pack equipment
         try {
             Platform.runLater(this::pack_d);
-            Thread.sleep(packTime);
+            Thread.sleep((long) (packTime/speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -137,9 +142,9 @@ public class Technician extends Thread{
     public void putAside(){// put aside equipment
         try {
             putAside_d();
-            Thread.sleep(putAsideTime);
+            Thread.sleep((long) (putAsideTime/speedRate));
             goBack2();
-            Thread.sleep(putAsideTime);
+            Thread.sleep((long) (putAsideTime/speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -175,9 +180,9 @@ public class Technician extends Thread{
     }
 
     public void goBack(){// go back
-        this.equipment.goToTechnician(new Pair<>(350, 250), goToStorageTime/4);
+        this.equipment.goToTechnician(new Pair<>(350, 250), (int) (goToStorageTime/(4*speedRate)));
         try {
-            Thread.sleep(goToStorageTime/4);
+            Thread.sleep((long) (goToStorageTime/(4*speedRate)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -185,7 +190,7 @@ public class Technician extends Thread{
         tt.byXProperty().set(-350+position.getKey());
         tt.byYProperty().set(-250+position.getValue());
         tt.play();
-        this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), goToStorageTime);
+        this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), (int) (goToStorageTime/speedRate));
     }
 
 
@@ -195,7 +200,7 @@ public class Technician extends Thread{
         st.setNode(progressBar);
         st.setByX(2);
         st.setByY(2);
-        st.setDuration(Duration.millis(time));
+        st.setDuration(Duration.millis(time/speedRate));
         st.play();
     }
 
@@ -206,7 +211,7 @@ public class Technician extends Thread{
         st.setNode(progressBar);
         st.setByX(-2);
         st.setByY(-2);
-        st.setDuration(Duration.millis(packTime));
+        st.setDuration(Duration.millis(packTime/speedRate));
         st.play();
         packMesh = new Rectangle(25,25);
         packMesh.setFill(Color.SANDYBROWN);
@@ -214,7 +219,7 @@ public class Technician extends Thread{
         packMesh.setY(equipment.getPosition().getValue()+10);
         root.getChildren().add(packMesh);
         packPos = new Pair<>(equipment.getPosition().getKey()-10, equipment.getPosition().getValue()+10);
-        equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue(), packTime);
+        equipment.putNoteOnBox_d(packPos.getKey(), packPos.getValue(), (int)(packTime/speedRate));
 
     }
     public void putAside_d(){// put aside equipment
@@ -222,19 +227,19 @@ public class Technician extends Thread{
         tt.setNode(Mesh);
         tt.byXProperty().set(1180-position.getKey());
         tt.setByY(175-position.getValue());
-        tt.setDuration(Duration.millis(putAsideTime));
+        tt.setDuration(Duration.millis(putAsideTime/speedRate));
 
         TranslateTransition ttp = new TranslateTransition();
         ttp.setNode(packMesh);
         ttp.byXProperty().set(1205-packPos.getKey());
         ttp.byYProperty().set(175-packPos.getValue());
-        ttp.setDuration(Duration.millis(putAsideTime));
+        ttp.setDuration(Duration.millis(putAsideTime/speedRate));
 
         TranslateTransition ttn = new TranslateTransition();
         ttn.setNode(equipment.getNoteMesh());
         ttn.byXProperty().set(1205-packPos.getKey());
         ttn.byYProperty().set(175-packPos.getValue());
-        ttn.setDuration(Duration.millis(putAsideTime));
+        ttn.setDuration(Duration.millis(putAsideTime/speedRate));
 
         tt.play();
         ttp.play();
@@ -245,9 +250,40 @@ public class Technician extends Thread{
         tt.setNode(Mesh);
         tt.byXProperty().set(-1180+position.getKey());
         tt.byYProperty().set(-175+position.getValue());
-        tt.setDuration(Duration.millis(putAsideTime));
+        tt.setDuration(Duration.millis(putAsideTime/speedRate));
         tt.play();
+    }
+    public void drawSlider(){//draw slider
 
+        VBox SliderBox = new VBox();
+        SliderBox.setLayoutX(100+150*(id+1));
+        SliderBox.setLayoutY(500);
+        SliderBox.setSpacing(10);
+
+        Label label = new Label("Technician's "+ id + " speed rate:\n" + speedRate);
+
+        Slider slider = new Slider();
+        slider.setMin(0.25);
+        slider.setMax(4);
+        slider.setValue(1);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(1);
+        slider.setMinorTickCount(10);
+        slider.setBlockIncrement(0.5);
+        slider.setLayoutX(50);
+        slider.setLayoutY(50);
+
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            speedRate = newValue.floatValue();
+            label.setText("Technician's "+ id + " speed rate:\n" + speedRate);
+
+        });
+
+        SliderBox.getChildren().add(label);
+        SliderBox.getChildren().add(slider);
+
+        root.getChildren().add(SliderBox);
 
     }
 }
