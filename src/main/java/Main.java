@@ -28,7 +28,6 @@ import static javafx.application.Application.launch;
 public class Main extends Application {
 
 
-
     public static void main(String[] args) {
         //prop = readProperties();
         launch(args);

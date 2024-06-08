@@ -10,7 +10,7 @@ import static java.lang.Thread.sleep;
 
 public class Equipment {
 
-    enum State{//state of equipment
+    enum State {//state of equipment
         WEAK_DAMAGED, DAMAGED, NOT_WORKING
     }
 
@@ -43,7 +43,8 @@ public class Equipment {
     private Circle Mesh;//mesh of equipment
 
     public static int positionOnStorage = 0;//position on storage
-    Equipment(int id, Group root){//constructor
+
+    Equipment(int id, Group root) {//constructor
         generateName();
         generateColor();
         generateState();
@@ -52,45 +53,47 @@ public class Equipment {
         this.root = root;
     }
 
-    public void generateName(){//generate name of equipment
-        int i = (int)(Math.random()*10);
+    public void generateName() {//generate name of equipment
+        int i = (int) (Math.random() * 10);
         name = nameOfEquipment[i];
     }
-    public void generateColor(){//generate color of equipment
-        int i = counter%10;
+
+    public void generateColor() {//generate color of equipment
+        int i = counter % 10;
         color = colors[i];
         counter++;
     }
-    public void generateState(){//generate state of equipment
-        int i = (int)(Math.random()*3);
+
+    public void generateState() {//generate state of equipment
+        int i = (int) (Math.random() * 3);
         state = State.values()[i];
     }
-
-
 
     public State getState() {
         return state;
     }//get state of equipment
 
-    public Owner getOwner(){
+    public Owner getOwner() {
         return this.owner;
     }//get owner of equipment
 
-    public void setAddress(String address){
+    public void setAddress(String address) {
         this.address = address;
     }//set address of equipment
-    public void setNote(Rectangle note, Pair<Integer, Integer> pos){//set note on equipment
+
+    public void setNote(Rectangle note, Pair<Integer, Integer> pos) {//set note on equipment
         this.noteMesh = note;
         this.notePos = pos;
     }
-    public void draw(Pair<Integer, Integer> pos){//draw equipment
+
+    public void draw(Pair<Integer, Integer> pos) {//draw equipment
         position = pos;
         this.Mesh = new Circle(pos.getKey(), pos.getValue(), 10, color);//create mesh of equipment
         root.getChildren().add(this.Mesh);//add mesh to root
         owner.draw(new Pair<>(pos.getKey(), pos.getValue()));
     }
 
-    public void stepForward(int time){//step forward of equipment
+    public void stepForward(int time) {//step forward of equipment
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(this.Mesh);
         tt.byXProperty().set(-75);
@@ -98,10 +101,10 @@ public class Equipment {
         tt.setDuration(javafx.util.Duration.millis(time));
         this.owner.stepForward(time);
         tt.play();//play animation
-        position = new Pair<>(position.getKey()-75, position.getValue());
+        position = new Pair<>(position.getKey() - 75, position.getValue());
     }
 
-    public void goToReceptionist(Pair<Integer, Integer> pos, int time, int exitTime){//set position of equipment to receptionist
+    public void goToReceptionist(Pair<Integer, Integer> pos, int time, int exitTime) {//set position of equipment to receptionist
         TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);
         tt.byXProperty().set(0);
         tt.byYProperty().set(-50);
@@ -109,24 +112,25 @@ public class Equipment {
         tt.play();//play animation
         position = new Pair<>(pos.getKey(), pos.getValue());
     }
-    public void goToStorage(int time){//set position of equipment to storage
+
+    public void goToStorage(int time) {//set position of equipment to storage
         TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
-        tt.byXProperty().set(320-position.getKey());
-        tt.byYProperty().set(250-position.getValue() - positionOnStorage*7);
+        tt.byXProperty().set(320 - position.getKey());
+        tt.byYProperty().set(250 - position.getValue() - positionOnStorage * 7);
 
         TranslateTransition ttn = new TranslateTransition(Duration.millis(time), this.noteMesh);//create animation for note
-        ttn.byXProperty().set(310-position.getKey());
-        ttn.byYProperty().set(250-position.getValue()- positionOnStorage*7);
+        ttn.byXProperty().set(310 - position.getKey());
+        ttn.byYProperty().set(250 - position.getValue() - positionOnStorage * 7);
 
         tt.play();//play animation
         ttn.play();//play animation
-        position = new Pair<>(320, 250- positionOnStorage*7);//set position of equipment
-        notePos = new Pair<>(310, 250- positionOnStorage*7);//set position of note
+        position = new Pair<>(320, 250 - positionOnStorage * 7);//set position of equipment
+        notePos = new Pair<>(310, 250 - positionOnStorage * 7);//set position of note
         positionOnStorage++;
-        positionOnStorage = positionOnStorage%30;
+        positionOnStorage = positionOnStorage % 30;
     }
 
-    public void goToTechnician(Pair<Integer, Integer> pos, int time){//set position of equipment to technician
+    public void goToTechnician(Pair<Integer, Integer> pos, int time) {//set position of equipment to technician
         TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
@@ -141,7 +145,7 @@ public class Equipment {
         notePos = pos;
     }
 
-    public void goToWorkPlace(Pair<Integer, Integer> pos, int time){//set position of equipment to work place
+    public void goToWorkPlace(Pair<Integer, Integer> pos, int time) {//set position of equipment to work place
         TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
         tt.byXProperty().set(pos.getKey() - position.getKey());
         tt.byYProperty().set(pos.getValue() - position.getValue());
@@ -158,7 +162,7 @@ public class Equipment {
 
     }
 
-    public void putNoteOnBox_d(){//put note on box animation
+    public void putNoteOnBox_d() {//put note on box animation
 
         TranslateTransition ttn = new TranslateTransition(Duration.millis(1), this.noteMesh);//create animation for note
         ttn.setToX(0);
@@ -166,15 +170,19 @@ public class Equipment {
         ttn.play();
         root.getChildren().remove(owner.getMesh());
     }
-    public Pair<Integer, Integer> getPosition(){
+
+    public Pair<Integer, Integer> getPosition() {
         return position;
     }
-    public Circle getMesh(){
+
+    public Circle getMesh() {
         return this.Mesh;
     }
-    public Rectangle getNoteMesh(){
+
+    public Rectangle getNoteMesh() {
         return this.noteMesh;
     }
+
     public Pair<Integer, Integer> getNotePos() {
         return notePos;
     }

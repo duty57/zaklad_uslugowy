@@ -18,12 +18,12 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
-public class Technician extends Thread{
+public class Technician extends Thread {
 
 
     public String name;
     private int id;
-    private int [] reparationTime = {380, 800, 1700};
+    private int[] reparationTime = {380, 800, 1700};
     private Service service;
     private Equipment equipment;
     private int time;
@@ -42,7 +42,8 @@ public class Technician extends Thread{
     private Rectangle packMesh;// mesh of packed equipment
     private Pair<Integer, Integer> packPos;// position of packed equipment
     private VBox box;
-    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int repairTime, int packTime, int putAsideTime){// constructor
+
+    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int repairTime, int packTime, int putAsideTime) {// constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
@@ -53,37 +54,38 @@ public class Technician extends Thread{
         this.packTime = packTime;
         this.putAsideTime = putAsideTime;
         this.root = root;
-        position = new Pair<>(850 + 100*id, 25);
+        position = new Pair<>(850 + 100 * id, 25);
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
     }
-    public void run(){
 
-        while(service.getEquipment() > 0 || service.getQueueSize() > 0){// while there are equipment to fix
-            try{
+    public void run() {
+
+        while (service.getEquipment() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
+            try {
                 speedRate = currentSpeedRate;
                 semaphore.acquire();
                 accessToSprzet.acquire();
-                boolean czyJestSprzet = takeEquipment();
-                if (czyJestSprzet) {
+                boolean ifAvaliableEquipment = takeEquipment();
+                if (ifAvaliableEquipment) {
                     accessToSprzet.release();
                     this.fix();
                     this.packEquipment();
                     this.putAside();
-                }else{
+                } else {
                     accessToSprzet.release();
                 }
 
                 semaphore.release();
-            } catch(InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public boolean takeEquipment(){// take equipment from service
+    public boolean takeEquipment() {// take equipment from service
         try {
-            if(service.getEquipment() == 0){
+            if (service.getEquipment() == 0) {
                 return false;
             }
             this.equipment = service.takeEquipment();
@@ -91,9 +93,9 @@ public class Technician extends Thread{
                 System.out.println("Technician " + this.id + " fixing equipment nr " + this.equipment.id);
                 service.removeEquipment(equipment);
                 goForEquipment();
-                Thread.sleep((long) (goToStorageTime/speedRate));
+                Thread.sleep((long) (goToStorageTime / speedRate));
                 goBack();
-                Thread.sleep((long) (goToStorageTime/speedRate));
+                Thread.sleep((long) (goToStorageTime / speedRate));
                 return true;
             } else {
                 return false;
@@ -106,26 +108,25 @@ public class Technician extends Thread{
     }
 
 
-
-    public void fix(){// fix equipment
+    public void fix() {// fix equipment
         try {
 
             Random rand = new Random();
             switch (this.equipment.getState()) {
                 case Equipment.State.WEAK_DAMAGED:
-                    time = (int) ((rand.nextInt(reparationTime[0]) + reparationTime[0])/speedRate);
+                    time = (int) ((rand.nextInt(reparationTime[0]) + reparationTime[0]) / speedRate);
                     fix_d();
-                    Thread.sleep((long) (time/speedRate));
+                    Thread.sleep((long) (time / speedRate));
                     break;
                 case Equipment.State.DAMAGED:
-                    time = (int) ((rand.nextInt(reparationTime[1]) + reparationTime[1])/speedRate);
+                    time = (int) ((rand.nextInt(reparationTime[1]) + reparationTime[1]) / speedRate);
                     fix_d();
-                    Thread.sleep((long) (time/speedRate));
+                    Thread.sleep((long) (time / speedRate));
                     break;
                 case Equipment.State.NOT_WORKING:
-                    time = (int) ((rand.nextInt(reparationTime[2]) + reparationTime[2])/speedRate);
+                    time = (int) ((rand.nextInt(reparationTime[2]) + reparationTime[2]) / speedRate);
                     fix_d();
-                    Thread.sleep((long) (time/speedRate));
+                    Thread.sleep((long) (time / speedRate));
                     break;
             }
         } catch (InterruptedException e) {
@@ -133,26 +134,27 @@ public class Technician extends Thread{
         }
     }
 
-    public void packEquipment(){// pack equipment
+    public void packEquipment() {// pack equipment
         try {
             Platform.runLater(this::pack_d);
-            Thread.sleep((long) (packTime/speedRate));
+            Thread.sleep((long) (packTime / speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void putAside(){// put aside equipment
+    public void putAside() {// put aside equipment
         try {
             putAside_d();
-            Thread.sleep((long) (putAsideTime/speedRate));
-            goBack2();
-            Thread.sleep((long) (putAsideTime/speedRate));
+            Thread.sleep((long) (putAsideTime / speedRate));
+            Platform.runLater(this::goBack2);
+            Thread.sleep((long) (putAsideTime / speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-    public void draw(){// draw technician
+
+    public void draw() {// draw technician
 
         Image image = null;
         try {
@@ -167,7 +169,7 @@ public class Technician extends Thread{
         this.Mesh.setFitWidth(50);
         this.Mesh.toBack();
 
-        this.progressBar = new Circle(position.getKey()+25, position.getValue()+60, 2, Color.GREEN);// progress bar
+        this.progressBar = new Circle(position.getKey() + 25, position.getValue() + 60, 2, Color.GREEN);// progress bar
         this.progressBar.toFront();
         this.progressBar.setVisible(false);
 
@@ -175,53 +177,53 @@ public class Technician extends Thread{
         root.getChildren().add(this.progressBar);
     }
 
-    public void goForEquipment(){// go for equipment
-        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(speedRate))), Mesh);
-        tt.byXProperty().set(350-position.getKey());
-        tt.byYProperty().set(250-position.getValue());
+    public void goForEquipment() {// go for equipment
+        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime / (speedRate))), Mesh);
+        tt.byXProperty().set(350 - position.getKey());
+        tt.byYProperty().set(250 - position.getValue());
         tt.play();
     }
 
-    public void goBack(){// go back
-        this.equipment.goToTechnician(new Pair<>(350, 250), (int) (goToStorageTime/(4*speedRate)));
+    public void goBack() {// go back
+        this.equipment.goToTechnician(new Pair<>(350, 250), (int) (goToStorageTime / (4 * speedRate)));
         try {
-            Thread.sleep((long) (goToStorageTime/(4*speedRate)));
+            Thread.sleep((long) (goToStorageTime / (4 * speedRate)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime/(speedRate))), Mesh);
+        TranslateTransition tt = new TranslateTransition(Duration.millis((int) (goToStorageTime / (speedRate))), Mesh);
         tt.setToX(0);
         tt.setToY(0);
-        this.equipment.goToWorkPlace(new Pair<>(850 + 100*id, 25), (int) (goToStorageTime/speedRate));
+        this.equipment.goToWorkPlace(new Pair<>(850 + 100 * id, 25), (int) (goToStorageTime / speedRate));
         tt.play();
     }
 
 
-    public void fix_d(){// fix equipment
+    public void fix_d() {// fix equipment
         progressBar.setVisible(true);
         ScaleTransition st = new ScaleTransition();
         st.setNode(progressBar);
         st.setByX(2);
         st.setByY(2);
-        st.setDuration(Duration.millis(time/speedRate));
+        st.setDuration(Duration.millis(time / speedRate));
         st.play();
     }
 
-        public void pack_d(){// pack equipment
+    public void pack_d() {// pack equipment
         progressBar.setVisible(false);// hide progress bar
         equipment.getMesh().setVisible(false);// hide equipment mesh
         ScaleTransition st = new ScaleTransition();// show progress bar
         st.setNode(progressBar);
         st.setByX(-2);
         st.setByY(-2);
-        st.setDuration(Duration.millis(packTime/speedRate));
+        st.setDuration(Duration.millis(packTime / speedRate));
         st.play();
 
-        packMesh = new Rectangle(25,25);
+        packMesh = new Rectangle(25, 25);
         packMesh.setFill(Color.SANDYBROWN);
-        packMesh.setX(equipment.getPosition().getKey()-10);
-        packMesh.setY(equipment.getPosition().getValue()+10);
-        packPos = new Pair<>(equipment.getPosition().getKey()-10, equipment.getPosition().getValue()+10);
+        packMesh.setX(equipment.getPosition().getKey() - 10);
+        packMesh.setY(equipment.getPosition().getValue() + 10);
+        packPos = new Pair<>(equipment.getPosition().getKey() - 10, equipment.getPosition().getValue() + 10);
         equipment.putNoteOnBox_d();
 
         box = new VBox();
@@ -234,40 +236,47 @@ public class Technician extends Thread{
 
 
     }
-    public void putAside_d(){// put aside equipment
+
+    public void putAside_d() {// put aside equipment
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
-        tt.byXProperty().set(1180-position.getKey());
-        tt.setByY(175-position.getValue());
-        tt.setDuration(Duration.millis(putAsideTime/speedRate));
+        tt.byXProperty().set(1180 - position.getKey());
+        tt.setByY(175 - position.getValue());
+        tt.setDuration(Duration.millis(putAsideTime / speedRate));
 
         TranslateTransition ttb = new TranslateTransition();
         ttb.setNode(this.box);
-        ttb.byXProperty().set(1205-position.getKey());
-        ttb.byYProperty().set(175-position.getValue());
-        ttb.setDuration(Duration.millis(putAsideTime/speedRate));
+        ttb.byXProperty().set(1205 - position.getKey());
+        ttb.byYProperty().set(175 - position.getValue());
+        ttb.setDuration(Duration.millis(putAsideTime / speedRate));
 
 
         tt.play();
         ttb.play();
 
     }
-    public void goBack2(){// go back
+
+    public void goBack2() {// go back
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
         tt.setToX(0);
         tt.setToY(0);
-        tt.setDuration(Duration.millis(putAsideTime/speedRate));
+        tt.setDuration(Duration.millis(putAsideTime / speedRate));
         tt.play();
+        root.getChildren().remove(box);
+        root.getChildren().remove(packMesh);
+        root.getChildren().removeAll(equipment.getNoteMesh());
+        root.getChildren().remove(equipment.getMesh());
     }
-    public void drawSlider(){//draw slider
+
+    public void drawSlider() {//draw slider
 
         VBox SliderBox = new VBox();
-        SliderBox.setLayoutX(100+150*(id+1));
+        SliderBox.setLayoutX(100 + 150 * (id + 1));
         SliderBox.setLayoutY(500);
         SliderBox.setSpacing(10);
 
-        Label label = new Label("Technician's "+ id + " speed rate:\n" + currentSpeedRate);
+        Label label = new Label("Technician's " + id + " speed rate:\n" + currentSpeedRate);
 
         Slider slider = new Slider();
         slider.setMin(0.25);
@@ -283,7 +292,7 @@ public class Technician extends Thread{
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             currentSpeedRate = newValue.floatValue();
-            label.setText("Technician's "+ id + " speed rate:\n" + currentSpeedRate);
+            label.setText("Technician's " + id + " speed rate:\n" + currentSpeedRate);
 
         });
 

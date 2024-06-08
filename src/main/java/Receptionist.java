@@ -1,6 +1,7 @@
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
@@ -15,7 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.concurrent.Semaphore;
 
-public class Receptionist extends Thread{
+public class Receptionist extends Thread {
 
     public String name;
     public int id;
@@ -28,6 +29,8 @@ public class Receptionist extends Thread{
     private int writeDownAddressTime;
     private int stepForwardTime;
     private int clientExitTime;
+    private int drawnClients = 0;
+
     private Group root;
     private ImageView mesh;//image of receptionist
     private Pair<Integer, Integer> defaultPosition;//position of receptionist
@@ -35,7 +38,7 @@ public class Receptionist extends Thread{
     private int positionOnStorage = 0;//position of equipment in storage
     private VBox SliderBox;
 
-    public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime){//constructor
+    public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
@@ -48,42 +51,48 @@ public class Receptionist extends Thread{
         defaultPosition = new Pair<>(700, 275);
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
+        Platform.runLater(this::drawButton);
     }
 
-    public void run(){
-        while(service.getQueueSize() > 0){//while there are clients in queue
-            if(iterator == 0){//draw clients only once
-                Platform.runLater(this::drawClients);
+    public void run() {
+        while (service.getQueueSize() > 0) {//while thread is not interrupted
+
+
+
+                if (iterator == 0) {//draw clients only once
+                    Platform.runLater(this::drawClients);
+                }
+                try {
+                    semaphore.acquire();//acquire semaphore
+                    speedRate = currentSpeedRate;
+                    addEquipment();
+                    System.out.println("Amount of equipment in storage: " + service.getEquipment());
+                    System.out.println("Length of queue: " + service.getQueueSize());
+                    semaphore.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                iterator++;
+                positionOnStorage++;
+                positionOnStorage = positionOnStorage % 30;
             }
-            try{
-                semaphore.acquire();//acquire semaphore
-                speedRate = currentSpeedRate;
-                addEquipment();
-                System.out.println("Amount of equipment in storage: " + service.getEquipment());
-                System.out.println("Length of queue: " + service.getQueueSize());
-                semaphore.release();
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
-            iterator++;
-            positionOnStorage++;
-            positionOnStorage = positionOnStorage % 30;
         }
-    }
-    public void addEquipment(){//add equipment to storage
+
+
+    public void addEquipment() {//add equipment to storage
         try {
-            if(service.getEquipment() <= service.MAX_SIZE){//if storage is not full
+            if (service.getEquipment() <= service.MAX_SIZE) {//if storage is not full
                 this.equipment = service.takeFromQueue();
                 System.out.println("Sprzet: " + equipment.id + " dodany do magazynu");
                 writeDownAddress();
                 service.removeFromQueue(equipment);
                 moveClient();
                 goToStorage();
-                Thread.sleep((long) (goToStorageTime/speedRate));
+                Thread.sleep((long) (goToStorageTime / speedRate));
                 goBack();
-                Thread.sleep((long) (goToStorageTime/speedRate));
+                Thread.sleep((long) (goToStorageTime / speedRate));
                 service.addEquipment(equipment);
-            }else {
+            } else {
                 service.removeFromQueue(equipment);
                 service.addToQueue(equipment);
             }
@@ -92,16 +101,17 @@ public class Receptionist extends Thread{
         }
     }
 
-    public void writeDownAddress(){//write down address of equipment
+    public void writeDownAddress() {//write down address of equipment
         Platform.runLater(this::writeDownAdress_d);
         try {
-            Thread.sleep((long) (writeDownAddressTime/speedRate));
+            Thread.sleep((long) (writeDownAddressTime / speedRate));
             this.equipment.setAddress(this.equipment.getOwner().getAddress());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-    public void draw(){//draw receptionist
+
+    public void draw() {//draw receptionist
         //draw png with name and color
         Image image = null;
         try {
@@ -125,48 +135,51 @@ public class Receptionist extends Thread{
         root.getChildren().add(adminTable);
     }
 
-    public void goToStorage(){//go to storage
+    public void goToStorage() {//go to storage
         //translate imageView to another position and back as animation
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
-        translateTransition.setByX(320- defaultPosition.getKey());
-        translateTransition.setByY(-7*positionOnStorage-20);
-        this.equipment.goToReceptionist(defaultPosition, (int) (goToStorageTime/speedRate), clientExitTime);
-        try{
-            Thread.sleep((long) (goToStorageTime/speedRate));
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime / speedRate), mesh);
+        translateTransition.setByX(320 - defaultPosition.getKey());
+        translateTransition.setByY(-7 * positionOnStorage - 20);
+        this.equipment.goToReceptionist(defaultPosition, (int) (goToStorageTime / speedRate), clientExitTime);
+        try {
+            Thread.sleep((long) (goToStorageTime / speedRate));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.equipment.goToStorage((int) (goToStorageTime/speedRate));
+        this.equipment.goToStorage((int) (goToStorageTime / speedRate));
         translateTransition.play();
 
     }
-    public void goBack(){//go back to receptionist
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime/speedRate), mesh);
+
+    public void goBack() {//go back to receptionist
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(goToStorageTime / speedRate), mesh);
         translateTransition.setToX(0);
         translateTransition.setToY(0);
         translateTransition.play();
     }
-    public void drawClients(){//draw clients in queue
-        for(int i = 0; i < Service.queue.size(); i++) {
+
+    public void drawClients() {//draw clients in queue
+        for (int i = 0; i < Service.queue.size(); i++) {
             Service.queue.get(i).draw(new Pair<>(700 + i * 75, 350));
+            drawnClients++;
         }
     }
 
-    public void moveClient(){//move clients in queue
-        for(int i = 0; i < Service.queue.size(); i++){
-            Service.queue.get(i).stepForward((int) (stepForwardTime/speedRate));
+    public void moveClient() {//move clients in queue
+        for (int i = 0; i < Service.queue.size(); i++) {
+            Service.queue.get(i).stepForward((int) (stepForwardTime / speedRate));
         }
     }
 
-    public void writeDownAdress_d(){//write down address of equipment
-        Rectangle note = new Rectangle(defaultPosition.getKey()+25, defaultPosition.getValue()+25, 15, 5);
+    public void writeDownAdress_d() {//write down address of equipment
+        Rectangle note = new Rectangle(defaultPosition.getKey() + 25, defaultPosition.getValue() + 25, 15, 5);
         note.setFill(Color.YELLOW);
         root.getChildren().add(note);
-        this.equipment.setNote(note, new Pair<>(defaultPosition.getKey()+25, defaultPosition.getValue()+25));
+        this.equipment.setNote(note, new Pair<>(defaultPosition.getKey() + 25, defaultPosition.getValue() + 25));
     }
 
 
-    public void drawSlider(){//draw slider
+    public void drawSlider() {//draw slider
 
         SliderBox = new VBox();
         SliderBox.setLayoutX(100);
@@ -199,5 +212,25 @@ public class Receptionist extends Thread{
         root.getChildren().add(SliderBox);
     }
 
+    public void drawButton() {
+        Button button = new Button("Add more clients");
+        button.setLayoutX(250);
+        button.setLayoutY(600);
+        button.setOnAction(e -> addMoreEquipment());
+        root.getChildren().add(button);
+    }
+
+    public void addMoreEquipment() {
+        int n = 20;
+        if(service.getQueueSize() == 0){
+            service.createEquipment(0, n, root);
+            for (int i = 0; i < n; i++) {
+
+                Service.queue.get(i).draw(new Pair<>(700 + service.getQueueSize() + i * 75, 350));
+
+            }
+            System.out.println("Queue size: " + service.getQueueSize());
+        }
+    }
 }
 
