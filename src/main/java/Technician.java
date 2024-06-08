@@ -62,7 +62,7 @@ public class Technician extends Thread {
 
     public void run() {
 
-        while (service.getEquipment() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
+        while (service.getEquipmentSize() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
             try {
                 speedRate = currentSpeedRate;
                 semaphore.acquire();
@@ -86,7 +86,7 @@ public class Technician extends Thread {
 
     public boolean takeEquipment() {// take equipment from service
         try {
-            if (service.getEquipment() == 0) {
+            if (service.getEquipmentSize() == 0) {
                 return false;
             }
             this.equipment = service.takeEquipment();
@@ -146,7 +146,7 @@ public class Technician extends Thread {
 
     public void putAside() {// put aside equipment
         try {
-            putAside_d();
+            Platform.runLater(this::putAside_d);
             Thread.sleep((long) (putAsideTime / speedRate));
             Platform.runLater(this::goBack2);
             Thread.sleep((long) (putAsideTime / speedRate));
@@ -256,9 +256,9 @@ public class Technician extends Thread {
         ttb.byYProperty().set(175 - position.getValue());
         ttb.setDuration(Duration.millis(putAsideTime / speedRate));
 
-
         tt.play();
         ttb.play();
+        root.getChildren().remove(this.equipment.getOwner().getMesh());
 
     }
 

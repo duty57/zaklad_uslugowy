@@ -39,17 +39,19 @@ public class Equipment {
     private Pair<Integer, Integer> position;//position of equipment
     private Rectangle noteMesh;//note on equipment
     private Pair<Integer, Integer> notePos;//position of note
+    public static int numberOfEquipment = 0;
     public int id;
     private Circle Mesh;//mesh of equipment
 
     public static int positionOnStorage = 0;//position on storage
 
-    Equipment(int id, Group root) {//constructor
+    Equipment(Group root) {//constructor
         generateName();
         generateColor();
         generateState();
         owner = new Owner(root, position);
-        this.id = id;
+        this.numberOfEquipment++;
+        id = numberOfEquipment;
         this.root = root;
     }
 
@@ -101,7 +103,9 @@ public class Equipment {
         tt.setDuration(javafx.util.Duration.millis(time));
         this.owner.stepForward(time);
         tt.play();//play animation
-        position = new Pair<>(position.getKey() - 75, position.getValue());
+        if(position != null) {
+            position = new Pair<>(position.getKey() - 75, position.getValue());
+        }
     }
 
     public void goToReceptionist(Pair<Integer, Integer> pos, int time, int exitTime) {//set position of equipment to receptionist
@@ -159,16 +163,21 @@ public class Equipment {
         ttn.play();//play animation
         position = pos;
         notePos = pos;
-
     }
-
     public void putNoteOnBox_d() {//put note on box animation
 
         TranslateTransition ttn = new TranslateTransition(Duration.millis(1), this.noteMesh);//create animation for note
         ttn.setToX(0);
         ttn.setToY(-15);
         ttn.play();
-        root.getChildren().remove(owner.getMesh());
+    }
+    public void goToFirstPosition(int time){
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
+        int translation = 700 - position.getKey();
+        tt.byXProperty().set(translation);
+        tt.play();//play animation
+        owner.goToFirstPosition(time, translation);
+        position = new Pair<>(700, position.getValue());
     }
 
     public Pair<Integer, Integer> getPosition() {

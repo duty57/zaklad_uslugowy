@@ -36,6 +36,9 @@ public class Receptionist extends Thread {
     private int iterator = 0;
     private int positionOnStorage = 0;//position of equipment in storage
     private VBox SliderBox;
+    Label lengthOfQueue = null;
+    private int clientsInQueueToMove = 9;
+    private int clientsInQueueToDraw = 9;
 
     public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
         this.id = id;
@@ -51,6 +54,7 @@ public class Receptionist extends Thread {
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
         Platform.runLater(this::drawButton);
+        Platform.runLater(this::drawLengthOfQueue);
     }
 
     public void run() {
@@ -61,10 +65,19 @@ public class Receptionist extends Thread {
                 }
                 try {
                     semaphore.acquire();//acquire semaphore
+
                     speedRate = currentSpeedRate;
+                    if(service.getQueueSize() > 10 || clientsInQueueToDraw == 0){
+                        Platform.runLater(this::drawClient);
+                        clientsInQueueToMove = (clientsInQueueToDraw == 0) ? 0 : 9;
+                    }else{
+                        clientsInQueueToMove--;
+                        clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw-1 : 0;
+                    }
                     addEquipment();
-                    System.out.println("Amount of equipment in storage: " + service.getEquipment());
+                    System.out.println("Amount of equipment in storage: " + service.getEquipmentSize());
                     System.out.println("Length of queue: " + service.getQueueSize());
+                    Platform.runLater(this::drawLengthOfQueue);
                     semaphore.release();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -78,17 +91,25 @@ public class Receptionist extends Thread {
 
     public void addEquipment() {//add equipment to storage
         try {
-            if (service.getEquipment() <= service.MAX_SIZE) {//if storage is not full
+            if (service.getEquipmentSize() <= service.MAX_SIZE) {//if storage is not full
                 this.equipment = service.takeFromQueue();
-                System.out.println("Sprzet: " + equipment.id + " dodany do magazynu");
+                System.out.println("Equipment: " + this.equipment.id + " was added to storage");
                 writeDownAddress();
                 service.removeFromQueue(equipment);
-                moveClient();
-                goToStorage();
-                Thread.sleep((long) (goToStorageTime / speedRate));
-                goBack();
-                Thread.sleep((long) (goToStorageTime / speedRate));
-                service.addEquipment(equipment);
+
+                if(service.getQueueSize() > 0){
+                    if (this.equipment.getPosition().getKey() > 730) {
+                        this.equipment.goToFirstPosition((int) (2 * goToStorageTime / speedRate));
+                        Thread.sleep((long) (2 * goToStorageTime / speedRate));
+                    }
+                        moveClient();
+                        goToStorage();
+                        Thread.sleep((long) (goToStorageTime / speedRate));
+                        goBack();
+                        Thread.sleep((long) (goToStorageTime / speedRate));
+                        service.addEquipment(equipment);
+
+                }
             } else {
                 service.removeFromQueue(equipment);
                 service.addToQueue(equipment);
@@ -156,13 +177,16 @@ public class Receptionist extends Thread {
     }
 
     public void drawClients() {//draw clients in queue
-        for (int i = 0; i < Service.queue.size(); i++) {
+        for (int i = 0; i < 10; i++) {
             Service.queue.get(i).draw(new Pair<>(700 + i * 75, 350));
         }
     }
+    public void drawClient(){
+        Service.queue.get(clientsInQueueToDraw).draw(new Pair<>(700 + 9 * 75, 350));//not 9
+    }
 
     public void moveClient() {//move clients in queue
-        for (int i = 0; i < Service.queue.size(); i++) {
+        for (int i = 0; i < clientsInQueueToMove; i++) {
             Service.queue.get(i).stepForward((int) (stepForwardTime / speedRate));
         }
     }
@@ -217,16 +241,20 @@ public class Receptionist extends Thread {
     }
 
     public void addMoreEquipment() {
-        int n = 20;
-        if(service.getQueueSize() == 0){
-            service.createEquipment(0, n, root);
-            for (int i = 0; i < n; i++) {
+        int n = 15;
 
-                Service.queue.get(i).draw(new Pair<>(700 + service.getQueueSize() + i * 75, 350));
+        service.createEquipment(n, root);
+    }
+    public void drawLengthOfQueue(){
 
-            }
-            System.out.println("Queue size: " + service.getQueueSize());
+        if(lengthOfQueue != null){
+            root.getChildren().remove(lengthOfQueue);
         }
+
+        lengthOfQueue = new Label("Length of queue: " + service.getQueueSize());
+        lengthOfQueue.setLayoutX(1050);
+        lengthOfQueue.setLayoutY(500);
+        root.getChildren().add(lengthOfQueue);
     }
 }
 

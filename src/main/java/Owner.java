@@ -2,6 +2,7 @@ import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.FileInputStream;
@@ -88,17 +89,24 @@ public class Owner {
         tt.byYProperty().set(0);
         tt.setDuration(javafx.util.Duration.millis(time));
         tt.play();
-        position = new Pair<>(position.getKey() - 75, position.getValue());//changing position
+        //position = new Pair<>(position.getKey() - 75, position.getValue());//changing position
     }
 
     public void exit(int time) {//method moving owner out of the screen
         TranslateTransition tt = new TranslateTransition();
         tt.setNode(Mesh);
-        tt.byXProperty().set(-this.position.getKey() - 200);
+        tt.byXProperty().set(-1000);
         tt.byYProperty().set(0);
         tt.setDuration(javafx.util.Duration.millis(time));
         tt.play();
-        position = new Pair<>(-this.position.getKey(), this.position.getValue());//changing position
+        //position = new Pair<>(-this.position.getKey(), this.position.getValue());//changing position
+    }
+    public void goToFirstPosition(int time, int translation) {//method moving owner to the first position
+        TranslateTransition tt = new TranslateTransition(Duration.millis(time));
+        tt.setNode(Mesh);
+        tt.byXProperty().set(translation);
+        tt.play();
+        position = new Pair<>(700, position.getValue());//changing position
     }
 
     public ImageView getMesh() {

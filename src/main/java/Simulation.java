@@ -39,10 +39,9 @@ public class Simulation extends Thread {
             technician[i] = new Technician(i, service, semaphoreT, accessToEquipment, root, Integer.parseInt(prop.getProperty("t_goToStorageTime")), Integer.parseInt(prop.getProperty("t_repairTime")), Integer.parseInt(prop.getProperty("t_packTime")), Integer.parseInt(prop.getProperty("t_putAsideTime")));
         }
         for (int i = 0; i < numberOfEquipment; i++) {//creating equipment
-            Equipment equipment = new Equipment(i, root);
+            Equipment equipment = new Equipment(root);
             service.addToQueue(equipment);
         }
-
 
         receptionist.start();
         for (int i = 0; i < numberOfTechnicians; i++) {

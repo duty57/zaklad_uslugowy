@@ -36,7 +36,7 @@ public class Service {
         return this.equipment.getFirst();
     }
 
-    public int getEquipment() {//metoda zwracajaca rozmiar sprzetu
+    public int getEquipmentSize() {//metoda zwracajaca rozmiar sprzetu
         return this.equipment.size();
     }
 
@@ -47,10 +47,13 @@ public class Service {
     public static int getPostion(Equipment s) {
         return queue.indexOf(s);
     }
+    public LinkedList<Equipment> getQueue() {
+        return queue;
+    }
 
-    public void createEquipment(int id, int n, Group root) {//generating equipment
+    public void createEquipment(int n, Group root) {//generating equipment
         for (int i = 0; i < n; i++) {
-            Equipment equipment = new Equipment(id, root);
+            Equipment equipment = new Equipment(root);
             addToQueue(equipment);
         }
     }
