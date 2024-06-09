@@ -4,6 +4,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -15,10 +18,7 @@ import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
@@ -27,9 +27,9 @@ import static javafx.application.Application.launch;
 
 public class Main extends Application {
 
-
+    private boolean isRunning = false;
+    private Properties prop = readProperties();
     public static void main(String[] args) {
-        //prop = readProperties();
         launch(args);
 
     }
@@ -57,28 +57,101 @@ public class Main extends Application {
         readyForSend.setStroke(Color.BLACK);
         readyForSend.setStrokeWidth(2);
 
+        Rectangle adminTable = new Rectangle(600, 300, 600, 50);//admin table
+        adminTable.setStroke(Color.BLACK);
+        adminTable.setStrokeWidth(2);
+        adminTable.setFill(Color.WHITE);
 
-        Text entry = new Text(1050, 450, "Entry");
+        VBox setQueueSize = new VBox();//set queue size
+        setQueueSize.setSpacing(10);
+        setQueueSize.setLayoutX(200);
+        setQueueSize.setLayoutY(500);
+
+        Label queueSizeLabel = new Label("Set queue size:");//label for queue size
+        TextField queueSize = new TextField();
+        queueSize.setText(prop.getProperty("numberOfEquipment"));
+        queueSize.setMaxWidth(50);
+        setQueueSize.getChildren().addAll(queueSizeLabel, queueSize);
+
+
+        VBox setStorageSize = new VBox();//set storage size
+        setStorageSize.setSpacing(10);
+        setStorageSize.setLayoutX(300);
+        setStorageSize.setLayoutY(500);
+
+        Label storageSizeLabel = new Label("Set storage size:");//label for storage size
+        TextField storageSize = new TextField();
+        storageSize.setText(prop.getProperty("storageCapacity"));
+        storageSize.setMaxWidth(50);
+        setStorageSize.getChildren().addAll(storageSizeLabel, storageSize);
+
+        Button button = new Button("Start");
+        button.setLayoutX(250);
+        button.setLayoutY(650);
+        button.setOnAction(e -> {
+            if (!isRunning) {
+                Simulation sim = new Simulation(root, adminTable, prop);
+                sim.start();
+                isRunning = true;
+                prop.setProperty("numberOfEquipment", queueSize.getText());
+                prop.setProperty("storageCapacity", storageSize.getText());
+                OutputStream output = null;
+                try {
+                    output = new FileOutputStream("config.properties");
+
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try {
+                    prop.store(output, null);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                root.getChildren().remove(setQueueSize);
+                root.getChildren().remove(setStorageSize);
+            }
+        });
+
+        Text entry = new Text(1050, 450, "Entry");//entry for visitors
         entry.fontProperty().set(javafx.scene.text.Font.font(24));
 
-        Text exit = new Text(0, 400, "Exit");
+        Text exit = new Text(0, 400, "Exit");// exit for visitors
         exit.fontProperty().set(javafx.scene.text.Font.font(24));
 
+        //add all elements to root
         root.getChildren().add(entry);
         root.getChildren().add(exit);
         root.getChildren().add(workPlace);
         root.getChildren().add(road);
         root.getChildren().add(storage);
         root.getChildren().add(readyForSend);
+        root.getChildren().add(adminTable);
+        root.getChildren().add(button);
+        root.getChildren().add(setQueueSize);
+        root.getChildren().add(setStorageSize);
 
         stage.setTitle("Canvas");
         Scene scene = new Scene(root, 1200, 800, Color.WHITE);
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-
-        Simulation sim = new Simulation(root);
-        sim.start();
-
     }
+
+    public static Properties readProperties() {//reading properties file
+        File file = new File(".");
+        for (String fileNames : file.list()) System.out.println(fileNames);
+        try {
+            Properties prop = new Properties();
+            InputStream input = new FileInputStream("config.properties");
+            prop.load(input);
+            System.out.println("Properties file read successfully");
+            System.out.println("Properties: " + prop);
+            return prop;
+        } catch (IOException e) {
+            System.out.println("Error reading properties file");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

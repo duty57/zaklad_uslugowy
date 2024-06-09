@@ -31,6 +31,7 @@ public class Receptionist extends Thread {
     private int clientExitTime;
     private boolean semState = false;
     private Group root;
+    private Rectangle adminTable;
     private ImageView mesh;//image of receptionist
     private Pair<Integer, Integer> defaultPosition;//position of receptionist
     private int iterator = 0;
@@ -40,7 +41,7 @@ public class Receptionist extends Thread {
     private int clientsInQueueToMove = 9;
     private int clientsInQueueToDraw = 9;
 
-    public Receptionist(int id, Service service, Semaphore semaphore, Group root, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
+    public Receptionist(int id, Service service, Semaphore semaphore, Group root, Rectangle adminTable, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
@@ -50,6 +51,7 @@ public class Receptionist extends Thread {
         this.stepForwardTime = stepForwardTime;
         this.clientExitTime = clientExitTime;
         this.root = root;
+        this.adminTable = adminTable;
         defaultPosition = new Pair<>(700, 275);
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
@@ -59,7 +61,8 @@ public class Receptionist extends Thread {
 
     public void run() {
         while (service.getQueueSize() > 0) {//while thread is not interrupted
-
+            System.out.println("Amount of equipment in storage: " + service.getEquipmentSize());
+            if (service.getEquipmentSize() <= service.MAX_SIZE) {
                 if (iterator == 0) {//draw clients only once
                     Platform.runLater(this::drawClients);
                 }
@@ -67,15 +70,14 @@ public class Receptionist extends Thread {
                     semaphore.acquire();//acquire semaphore
 
                     speedRate = currentSpeedRate;
-                    if(service.getQueueSize() > 10 || clientsInQueueToDraw == 0){
+                    if (service.getQueueSize() > 10 || clientsInQueueToDraw == 0) {
                         Platform.runLater(this::drawClient);
                         clientsInQueueToMove = (clientsInQueueToDraw == 0) ? 0 : 9;
-                    }else{
+                    } else {
                         clientsInQueueToMove--;
-                        clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw-1 : 0;
+                        clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw - 1 : 0;
                     }
                     addEquipment();
-                    System.out.println("Amount of equipment in storage: " + service.getEquipmentSize());
                     System.out.println("Length of queue: " + service.getQueueSize());
                     Platform.runLater(this::drawLengthOfQueue);
                     semaphore.release();
@@ -86,12 +88,14 @@ public class Receptionist extends Thread {
                 positionOnStorage++;
                 positionOnStorage = positionOnStorage % 30;
             }
+            }
+
         }
 
 
     public void addEquipment() {//add equipment to storage
         try {
-            if (service.getEquipmentSize() <= service.MAX_SIZE) {//if storage is not full
+             //if storage is not full
                 this.equipment = service.takeFromQueue();
                 System.out.println("Equipment: " + this.equipment.id + " was added to storage");
                 writeDownAddress();
@@ -108,12 +112,8 @@ public class Receptionist extends Thread {
                         goBack();
                         Thread.sleep((long) (goToStorageTime / speedRate));
                         service.addEquipment(equipment);
-
                 }
-            } else {
-                service.removeFromQueue(equipment);
-                service.addToQueue(equipment);
-            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -144,12 +144,9 @@ public class Receptionist extends Thread {
         this.mesh.setFitWidth(50);
         this.mesh.toBack();
 
-        Rectangle adminTable = new Rectangle(600, 300, 600, 50);
-        adminTable.setStroke(Color.BLACK);
-        adminTable.setStrokeWidth(2);
-        adminTable.setFill(Color.WHITE);
 
         root.getChildren().add(this.mesh);
+        root.getChildren().remove(adminTable);
         root.getChildren().add(adminTable);
     }
 

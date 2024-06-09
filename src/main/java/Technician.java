@@ -23,14 +23,13 @@ public class Technician extends Thread {
 
     public String name;
     private int id;
-    private int[] reparationTime = {380, 800, 1700};
+    private int[] reparationTime;
     private Service service;
     private Equipment equipment;
     private int time;
     private float speedRate = 1;
     private float currentSpeedRate = 1;
     private int goToStorageTime;
-    private int repairTime;
     private int packTime;
     private int putAsideTime;
     private Semaphore semaphore;
@@ -44,14 +43,14 @@ public class Technician extends Thread {
     private Pair<Integer, Integer> packPos;// position of packed equipment
     private VBox box;
 
-    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int repairTime, int packTime, int putAsideTime) {// constructor
+    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int [] repairTime, int packTime, int putAsideTime) {// constructor
         this.id = id;
         this.service = service;
         this.semaphore = semaphore;
         this.accessToEquipment = accessToSprzet;
         this.name = "Technician_" + id;
         this.goToStorageTime = goToStorageTime;
-        this.repairTime = repairTime;
+        this.reparationTime = repairTime;
         this.packTime = packTime;
         this.putAsideTime = putAsideTime;
         this.root = root;
@@ -201,11 +200,12 @@ public class Technician extends Thread {
         tt.setToY(0);
         this.equipment.goToWorkPlace(new Pair<>(850 + 100 * id, 25), (int) (goToStorageTime / speedRate));
         tt.play();
+        semaphoreState.setFill(Color.GREEN);
+
     }
 
 
     public void fix_d() {// fix equipment
-        semaphoreState.setFill(Color.GREEN);
         progressBar.setVisible(true);
         ScaleTransition st = new ScaleTransition();
         st.setNode(progressBar);
