@@ -36,8 +36,8 @@ public class Service {
         return this.equipment.getFirst();
     }
 
-    public int getEquipmentSize() {//metoda zwracajaca rozmiar sprzetu
-        return this.equipment.size();
+    public static int getEquipmentSize() {//metoda zwracajaca rozmiar sprzetu
+        return equipment.size();
     }
 
     public int getQueueSize() {//metoda zwracajaca rozmiar kolejki

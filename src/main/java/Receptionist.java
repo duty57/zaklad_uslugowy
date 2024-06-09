@@ -36,7 +36,6 @@ public class Receptionist extends Thread {
     private Pair<Integer, Integer> defaultPosition;//position of receptionist
     private int iterator = 0;
     private int positionInStorage = 0;//position of equipment in storage
-    public static int amountOfEquipmentInStorage = 0;
     private VBox SliderBox;
     Label lengthOfQueue = null;
     private int clientsInQueueToMove = QUEUE_SIZE;
@@ -89,7 +88,6 @@ public class Receptionist extends Thread {
                     }
                     iterator++;
                     positionInStorage++;
-                    amountOfEquipmentInStorage++;
                     positionInStorage = positionInStorage % 30;
                 }
             }

@@ -1,4 +1,6 @@
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -112,7 +114,17 @@ public class Main extends Application {
             }
         });
 
-        Label amountOfEquipment = new Label("Amount of equipment in Storage:");//label for amount of equipment
+        Label amountOfEquipmentInStorage = new Label();//label for amount of equipment
+        amountOfEquipmentInStorage.setLayoutX(100);
+        amountOfEquipmentInStorage.setLayoutY(25);
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.millis(50), e -> {
+                    amountOfEquipmentInStorage.setText("Amount of equipment in Storage:\n" + Service.getEquipmentSize());
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE); // Run indefinitely
+        timeline.play();
 
         Text entry = new Text(1050, 450, "Entry");//entry for visitors
         entry.fontProperty().set(javafx.scene.text.Font.font(24));
@@ -131,6 +143,8 @@ public class Main extends Application {
         root.getChildren().add(button);
         root.getChildren().add(setQueueSize);
         root.getChildren().add(setStorageSize);
+        root.getChildren().add(amountOfEquipmentInStorage);
+
 
         stage.setTitle("Canvas");
         Scene scene = new Scene(root, 1200, 800, Color.WHITE);
