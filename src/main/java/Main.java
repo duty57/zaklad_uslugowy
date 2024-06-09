@@ -112,6 +112,8 @@ public class Main extends Application {
             }
         });
 
+        Label amountOfEquipment = new Label("Amount of equipment in Storage:");//label for amount of equipment
+
         Text entry = new Text(1050, 450, "Entry");//entry for visitors
         entry.fontProperty().set(javafx.scene.text.Font.font(24));
 

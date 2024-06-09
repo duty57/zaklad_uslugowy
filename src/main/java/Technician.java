@@ -85,6 +85,7 @@ public class Technician extends Thread {
 
     public boolean takeEquipment() {// take equipment from service
         try {
+            Receptionist.amountOfEquipmentInStorage--;
             if (service.getEquipmentSize() == 0) {
                 return false;
             }

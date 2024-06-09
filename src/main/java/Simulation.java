@@ -21,6 +21,7 @@ public class Simulation extends Thread {
     private Receptionist receptionist;
     Properties prop;
 
+
     public Simulation(Group root, Rectangle adminTable, Properties prop) {
         this.root = root;
         this.adminTable = adminTable;
@@ -72,21 +73,5 @@ public class Simulation extends Thread {
         }
     }
 
-//    public static Properties readProperties() {//reading properties file
-//        File file = new File(".");
-//        for (String fileNames : file.list()) System.out.println(fileNames);
-//        try {
-//            Properties prop = new Properties();
-//            InputStream input = new FileInputStream("config.properties");
-//            prop.load(input);
-//            System.out.println("Properties file read successfully");
-//            System.out.println("Properties: " + prop);
-//            return prop;
-//        } catch (IOException e) {
-//            System.out.println("Error reading properties file");
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
 }
