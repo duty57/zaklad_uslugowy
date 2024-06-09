@@ -38,8 +38,8 @@ public class Receptionist extends Thread {
     private int positionOnStorage = 0;//position of equipment in storage
     private VBox SliderBox;
     Label lengthOfQueue = null;
-    private int clientsInQueueToMove = 9;
-    private int clientsInQueueToDraw = 9;
+    private int clientsInQueueToMove = 10;
+    private int clientsInQueueToDraw = 10;
 
     public Receptionist(int id, Service service, Semaphore semaphore, Group root, Rectangle adminTable, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
         this.id = id;
@@ -56,7 +56,7 @@ public class Receptionist extends Thread {
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
         Platform.runLater(this::drawButton);
-        Platform.runLater(this::drawLengthOfQueue);
+        // Platform.runLater(this::drawLengthOfQueue);
     }
 
     public void run() {
@@ -72,7 +72,7 @@ public class Receptionist extends Thread {
                     speedRate = currentSpeedRate;
                     if (service.getQueueSize() > 10 || clientsInQueueToDraw == 0) {
                         Platform.runLater(this::drawClient);
-                        clientsInQueueToMove = (clientsInQueueToDraw == 0) ? 0 : 9;
+                        clientsInQueueToMove = (clientsInQueueToDraw == 0) ? 0 : 10;
                     } else {
                         clientsInQueueToMove--;
                         clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw - 1 : 0;
@@ -99,19 +99,21 @@ public class Receptionist extends Thread {
                 this.equipment = service.takeFromQueue();
                 System.out.println("Equipment: " + this.equipment.id + " was added to storage");
                 writeDownAddress();
-                service.removeFromQueue(equipment);
-
+                System.out.println("Equipment position: " + this.equipment.getPosition().getKey());
                 if(service.getQueueSize() > 0){
                     if (this.equipment.getPosition().getKey() > 730) {
                         this.equipment.goToFirstPosition((int) (2 * goToStorageTime / speedRate));
                         Thread.sleep((long) (2 * goToStorageTime / speedRate));
                     }
+                    else {
+                        service.removeFromQueue(equipment);
                         moveClient();
                         goToStorage();
                         Thread.sleep((long) (goToStorageTime / speedRate));
                         goBack();
                         Thread.sleep((long) (goToStorageTime / speedRate));
                         service.addEquipment(equipment);
+                    }
                 }
 
         } catch (InterruptedException e) {
