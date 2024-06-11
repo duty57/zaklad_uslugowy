@@ -171,14 +171,6 @@ public class Equipment {
         ttn.setToY(-15);
         ttn.play();
     }
-    public void goToFirstPosition(int time){
-        TranslateTransition tt = new TranslateTransition(Duration.millis(time), this.Mesh);//create animation for equipment
-        int translation = 700 - position.getKey();
-        tt.byXProperty().set(translation);
-        tt.play();//play animation
-        owner.goToFirstPosition(time, translation);
-        position = new Pair<>(700, position.getValue());
-    }
 
     public Pair<Integer, Integer> getPosition() {
         return position;

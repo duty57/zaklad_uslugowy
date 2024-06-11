@@ -25,7 +25,6 @@ public class Receptionist extends Thread {
     private float currentSpeedRate = 1;
     private Service service;
     private Equipment equipment;
-    private Semaphore semaphore;
     private int goToStorageTime;
     private int writeDownAddressTime;
     private int stepForwardTime;
@@ -41,10 +40,9 @@ public class Receptionist extends Thread {
     private int clientsInQueueToMove = QUEUE_SIZE;
     private int clientsInQueueToDraw = QUEUE_SIZE;
 
-    public Receptionist(int id, Service service, Semaphore semaphore, Group root, Rectangle adminTable, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
+    public Receptionist(int id, Service service, Group root, Rectangle adminTable, int goToStorageTime, int writeDownAddressTime, int stepForwardTime, int clientExitTime) {//constructor
         this.id = id;
         this.service = service;
-        this.semaphore = semaphore;
         this.name = "Receptionist_" + id;
         this.goToStorageTime = goToStorageTime;
         this.writeDownAddressTime = writeDownAddressTime;
@@ -69,23 +67,16 @@ public class Receptionist extends Thread {
                     if (iterator == 0) {//draw clients only once
                         Platform.runLater(this::drawClients);
                     }
-                    try {
-                        semaphore.acquire();//acquire semaphore
-                        speedRate = currentSpeedRate;
-                        if (service.getQueueSize() > QUEUE_SIZE) {
-                            Platform.runLater(this::drawClient);
-                            //clientsInQueueToMove = QUEUE_SIZE;
-                        } else {
-                            clientsInQueueToMove--;
-                            clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw - 1 : 0;
-                        }
-                        addEquipment();
-                        System.out.println("Length of queue: " + service.getQueueSize());
-                        Platform.runLater(this::drawLengthOfQueue);
-                        semaphore.release();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    speedRate = currentSpeedRate;
+                    if (service.getQueueSize() > QUEUE_SIZE) {
+                        Platform.runLater(this::drawClient);
+                    } else {
+                        clientsInQueueToMove--;
+                        clientsInQueueToDraw = (clientsInQueueToDraw > 0) ? clientsInQueueToDraw - 1 : 0;
                     }
+                    addEquipment();
+                    System.out.println("Length of queue: " + service.getQueueSize());
+                    Platform.runLater(this::drawLengthOfQueue);
                     iterator++;
                     positionInStorage++;
                     positionInStorage = positionInStorage % 30;

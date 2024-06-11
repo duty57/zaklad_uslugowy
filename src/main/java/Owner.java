@@ -101,14 +101,6 @@ public class Owner {
         tt.play();
         //position = new Pair<>(-this.position.getKey(), this.position.getValue());//changing position
     }
-    public void goToFirstPosition(int time, int translation) {//method moving owner to the first position
-        TranslateTransition tt = new TranslateTransition(Duration.millis(time));
-        tt.setNode(Mesh);
-        tt.byXProperty().set(translation);
-        tt.play();
-        position = new Pair<>(700, position.getValue());//changing position
-    }
-
     public ImageView getMesh() {
         return Mesh;
     }

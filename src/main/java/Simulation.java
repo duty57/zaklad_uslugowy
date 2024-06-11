@@ -11,8 +11,6 @@ import java.util.concurrent.Semaphore;
 
 public class Simulation extends Thread {
 
-    private Semaphore semaphoreT = new Semaphore(3);//semaphore for technicians
-    private Semaphore semaphoreR = new Semaphore(1);//semaphore for receptionists
     private Semaphore accessToEquipment = new Semaphore(1);//semaphore for equipment
     private Service service;
     private Technician[] technician = new Technician[3];
@@ -33,13 +31,11 @@ public class Simulation extends Thread {
         int numberOfTechnicians = Integer.parseInt(prop.getProperty("numberOfTechnicians"));
         int numberOfReceptionists = Integer.parseInt(prop.getProperty("numberOfReceptionists"));
         int numberOfEquipment = Math.max(Integer.parseInt(prop.getProperty("numberOfEquipment")), 10);
-        int storageCapacity = Integer.parseInt(prop.getProperty("storageCapacity"));
-        semaphoreT = new Semaphore(numberOfTechnicians);
-        semaphoreR = new Semaphore(numberOfReceptionists);
+        int storageCapacity = Math.min(Integer.parseInt(prop.getProperty("storageCapacity")),100);
 
         service = new Service(storageCapacity);
 
-        receptionist = new Receptionist(0, service, semaphoreR, root, adminTable, Integer.parseInt(prop.getProperty("r_goToStorageTime")), Integer.parseInt(prop.getProperty("r_writeDownAddressTime")), Integer.parseInt(prop.getProperty("r_stepForwardTime")), Integer.parseInt(prop.getProperty("r_clientExitTime")));
+        receptionist = new Receptionist(0, service, root, adminTable, Integer.parseInt(prop.getProperty("r_goToStorageTime")), Integer.parseInt(prop.getProperty("r_writeDownAddressTime")), Integer.parseInt(prop.getProperty("r_stepForwardTime")), Integer.parseInt(prop.getProperty("r_clientExitTime")));
 
         //convert string array to int
         int[] reparationTime = new int[3];
@@ -51,7 +47,7 @@ public class Simulation extends Thread {
         }
 
         for (int i = 0; i < numberOfTechnicians; i++) {//creating technicians
-            technician[i] = new Technician(i, service, semaphoreT, accessToEquipment, root, Integer.parseInt(prop.getProperty("t_goToStorageTime")), reparationTime, Integer.parseInt(prop.getProperty("t_packTime")), Integer.parseInt(prop.getProperty("t_putAsideTime")));
+            technician[i] = new Technician(i, service, accessToEquipment, root, Integer.parseInt(prop.getProperty("t_goToStorageTime")), reparationTime, Integer.parseInt(prop.getProperty("t_packTime")), Integer.parseInt(prop.getProperty("t_putAsideTime")));
         }
         for (int i = 0; i < numberOfEquipment; i++) {//creating equipment
             Equipment equipment = new Equipment(root);

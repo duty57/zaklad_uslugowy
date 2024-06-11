@@ -44,9 +44,6 @@ public class Service {
         return this.queue.size();
     }
 
-    public static int getPostion(Equipment s) {
-        return queue.indexOf(s);
-    }
     public LinkedList<Equipment> getQueue() {
         return queue;
     }

@@ -20,7 +20,6 @@ import java.util.concurrent.Semaphore;
 
 public class Technician extends Thread {
 
-
     public String name;
     private int id;
     private int[] reparationTime;
@@ -32,7 +31,6 @@ public class Technician extends Thread {
     private int goToStorageTime;
     private int packTime;
     private int putAsideTime;
-    private Semaphore semaphore;
     private Semaphore accessToEquipment;
     private static Circle semaphoreState;
     private Group root;
@@ -43,10 +41,9 @@ public class Technician extends Thread {
     private Pair<Integer, Integer> packPos;// position of packed equipment
     private VBox box;
 
-    public Technician(int id, Service service, Semaphore semaphore, Semaphore accessToSprzet, Group root, int goToStorageTime, int [] repairTime, int packTime, int putAsideTime) {// constructor
+    public Technician(int id, Service service, Semaphore accessToSprzet, Group root, int goToStorageTime, int [] repairTime, int packTime, int putAsideTime) {// constructor
         this.id = id;
         this.service = service;
-        this.semaphore = semaphore;
         this.accessToEquipment = accessToSprzet;
         this.name = "Technician_" + id;
         this.goToStorageTime = goToStorageTime;
@@ -64,7 +61,6 @@ public class Technician extends Thread {
         while (service.getEquipmentSize() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
             try {
                 speedRate = currentSpeedRate;
-                semaphore.acquire();
                 accessToEquipment.acquire();
                 boolean ifAvaliableEquipment = takeEquipment();
                 if (ifAvaliableEquipment) {
@@ -76,7 +72,6 @@ public class Technician extends Thread {
                     accessToEquipment.release();
                 }
 
-                semaphore.release();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
