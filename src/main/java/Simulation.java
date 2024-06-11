@@ -12,11 +12,11 @@ import java.util.concurrent.Semaphore;
 public class Simulation extends Thread {
 
     private Semaphore accessToEquipment = new Semaphore(1);//semaphore for equipment
-    private Service service;
+    public Service service;
     private Technician[] technician = new Technician[3];
     private Group root;
     private Rectangle adminTable;
-    private Receptionist receptionist;
+    public Receptionist receptionist;
     Properties prop;
 
 

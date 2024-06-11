@@ -36,6 +36,7 @@ public class Service {
         return this.equipment.getFirst();
     }
 
+
     public static int getEquipmentSize() {//metoda zwracajaca rozmiar sprzetu
         return equipment.size();
     }

@@ -31,9 +31,9 @@ public class Main extends Application {
 
     private boolean isRunning = false;
     private Properties prop = readProperties();
+    private Simulation sim;
     public static void main(String[] args) {
         launch(args);
-
     }
 
     @Override
@@ -92,7 +92,7 @@ public class Main extends Application {
         button.setLayoutY(650);
         button.setOnAction(e -> {
             if (!isRunning) {
-                Simulation sim = new Simulation(root, adminTable, prop);
+                this.sim = new Simulation(root, adminTable, prop);
                 sim.start();
                 isRunning = true;
                 prop.setProperty("numberOfEquipment", queueSize.getText());
@@ -132,6 +132,8 @@ public class Main extends Application {
         Text exit = new Text(0, 400, "Exit");// exit for visitors
         exit.fontProperty().set(javafx.scene.text.Font.font(24));
 
+        drawButton(root);
+
         //add all elements to root
         root.getChildren().add(entry);
         root.getChildren().add(exit);
@@ -168,6 +170,21 @@ public class Main extends Application {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void drawButton(Group root) {
+        Button button = new Button("Add more clients");
+        button.setLayoutX(250);
+        button.setLayoutY(600);
+        button.setOnAction(e -> {
+
+            if(isRunning){
+                sim.receptionist.addMoreEquipment();
+
+            }
+        });
+        root.getChildren().add(button);
+
     }
 
 }

@@ -53,14 +53,14 @@ public class Receptionist extends Thread {
         defaultPosition = new Pair<>(700, 275);
         Platform.runLater(this::draw);
         Platform.runLater(this::drawSlider);
-        Platform.runLater(this::drawButton);
+        //Platform.runLater(this::drawButton);
         Platform.runLater(this::drawLengthOfQueue);
 
     }
 
     public void run() {
         while (!Thread.interrupted()) {//while thread is not interrupted
-            if(service.getQueueSize() > 0 ) {
+            if(service.getQueueSize() > 0) {
                 System.out.println("Amount of equipment in storage: " + service.getEquipmentSize());
 
                 if (service.getEquipmentSize() <= service.MAX_SIZE) {
@@ -80,11 +80,29 @@ public class Receptionist extends Thread {
                     iterator++;
                     positionInStorage++;
                     positionInStorage = positionInStorage % 30;
+                }else{
+                    synchronized (service) {
+                        try {
+                            service.wait();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
                 }
             }
+            else{
+                synchronized (service) {
+                    try {
+                        service.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
-
         }
+
+    }
 
 //make long animation for all clients in queue to go to receptionist
     public void addEquipment() {//add equipment to storage
@@ -220,25 +238,22 @@ public class Receptionist extends Thread {
         root.getChildren().add(SliderBox);
     }
 
-    public void drawButton() {
-        Button button = new Button("Add more clients");
-        button.setLayoutX(250);
-        button.setLayoutY(600);
-        button.setOnAction(e -> addMoreEquipment());
-        root.getChildren().add(button);
-    }
+
 
     public void addMoreEquipment() {
         int n = 100;
         int size = service.getQueueSize();
         service.createEquipment(n, root);
+        synchronized (service) {
+            service.notifyAll();
+        }
+
         if(size <= QUEUE_SIZE){
             addClients(size, QUEUE_SIZE+1);
             clientsInQueueToMove = QUEUE_SIZE;
             clientsInQueueToDraw = QUEUE_SIZE;
 
         }
-
     }
     public void addClients(int start, int n){
         for(int i = start; i < n; i++){

@@ -58,22 +58,34 @@ public class Technician extends Thread {
 
     public void run() {
 
-        while (service.getEquipmentSize() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
-            try {
-                speedRate = currentSpeedRate;
-                accessToEquipment.acquire();
-                boolean ifAvaliableEquipment = takeEquipment();
-                if (ifAvaliableEquipment) {
-                    accessToEquipment.release();
-                    this.fix();
-                    this.packEquipment();
-                    this.putAside();
-                } else {
-                    accessToEquipment.release();
+        while (!Thread.interrupted()) {
+            if (Service.getEquipmentSize() > 0 || service.getQueueSize() > 0) {// while there are equipment to fix
+                try {
+                    speedRate = currentSpeedRate;
+                    accessToEquipment.acquire();
+                    boolean ifAvaliableEquipment = takeEquipment();
+                    if (ifAvaliableEquipment) {
+                        accessToEquipment.release();
+                        this.fix();
+                        this.packEquipment();
+                        this.putAside();
+                    } else {
+                        accessToEquipment.release();
+                    }
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                synchronized (service) {
+                    try {
+                        service.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -84,6 +96,11 @@ public class Technician extends Thread {
                 return false;
             }
             this.equipment = service.takeEquipment();
+            if(Service.getEquipmentSize() == service.MAX_SIZE - 1){
+                synchronized (service) {
+                    service.notify();
+                }
+            }
             if (this.equipment != null) {// if there is equipment to fix
                 System.out.println("Technician " + this.id + " fixing equipment nr " + this.equipment.id);
                 service.removeEquipment(equipment);
