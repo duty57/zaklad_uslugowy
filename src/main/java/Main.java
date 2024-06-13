@@ -147,6 +147,9 @@ public class Main extends Application {
         root.getChildren().add(setStorageSize);
         root.getChildren().add(amountOfEquipmentInStorage);
 
+        stage.setOnCloseRequest(e -> {
+            System.exit(0);
+        });
 
         stage.setTitle("Canvas");
         Scene scene = new Scene(root, 1200, 800, Color.WHITE);
